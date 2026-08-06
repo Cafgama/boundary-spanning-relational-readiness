@@ -1,6 +1,6 @@
 function out = run_dynamics_fast(G, P, record_history)
   % RUN_DYNAMICS_FAST
-  % Faster version of run_dynamics.m.
+  % Faster agent-first version of the relational-confidence dynamics.
   %
   % Core optimization:
   %   Instead of recomputing R_B(t) by scanning all boundary edges at every
@@ -14,13 +14,12 @@ function out = run_dynamics_fast(G, P, record_history)
   %   4. Update relational confidence on the selected tie.
   %   5. If the selected tie is cross-boundary, update readiness count.
   %
-  % Inputs:
-  %   G              network structure from generate_network()
-  %   P              parameter structure from baseline_params()
-  %   record_history optional boolean. If true, stores RB over time.
+  % Rerun-v2 event-time convention:
+  %   T        = first-passage time if readiness is reached; NaN otherwise.
+  %   T_tilde  = observed time; T if reached, P.T_max if censored.
+  %   delta    = event indicator; 1 if reached, 0 if censored.
   %
-  % Output:
-  %   out structure with the same main fields as run_dynamics.m.
+  % This convention avoids treating P.T_max as an artificial event time.
 
   if nargin < 3
     record_history = false;
@@ -97,6 +96,8 @@ function out = run_dynamics_fast(G, P, record_history)
   % -----------------------------
   if RB >= P.q
     out.T = 0;
+    out.T_tilde = 0;
+    out.delta = 1;
     out.converged = 1;
     out.final_RB = RB;
     out.final_ready = ready_edges;
@@ -193,6 +194,8 @@ function out = run_dynamics_fast(G, P, record_history)
     % First-passage condition.
     if RB >= P.q
       out.T = t;
+      out.T_tilde = t;
+      out.delta = 1;
       out.converged = 1;
       out.final_RB = RB;
       out.final_ready = ready_edges;
@@ -212,9 +215,11 @@ function out = run_dynamics_fast(G, P, record_history)
   end
 
   % -----------------------------
-  % Non-convergence
+  % Non-convergence / right-censoring at P.T_max
   % -----------------------------
   out.T = NaN;
+  out.T_tilde = P.T_max;
+  out.delta = 0;
   out.converged = 0;
   out.final_RB = RB;
   out.final_ready = ready_edges;
