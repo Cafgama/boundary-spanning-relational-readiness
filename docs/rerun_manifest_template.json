@@ -1,0 +1,82 @@
+{
+  "manifest_version": "rerun_v2_template",
+  "project": "boundary-spanning-relational-readiness",
+  "branch": "rerun/balanced-survival-bootstrap",
+  "base_commit_preserved": "68d25a46ca94d9aaf6c52aab6b494346d4e165cc",
+  "created_for_step": "Step 1 - Protect old computational state",
+  "notes": "Template only. Concrete production manifests must record exact commit hash, parameters, seeds, output paths, and code version for each batch.",
+  "code_state": {
+    "repository": "Cafgama/boundary-spanning-relational-readiness",
+    "commit_hash": "TO_BE_FILLED_AT_RUN_TIME",
+    "run_branch": "rerun/balanced-survival-bootstrap",
+    "dirty_worktree_allowed": false
+  },
+  "output_namespace": {
+    "version": "rerun_v2",
+    "raw_dir": "results/raw/rerun_v2/",
+    "processed_dir": "results/processed/rerun_v2/",
+    "figure_data_dir": "results/figure_data/rerun_v2/",
+    "figure_dir": "figures/rerun_v2/"
+  },
+  "parameters": {
+    "nU": 20,
+    "nI": 20,
+    "rho_in": 0.20,
+    "k": 12,
+    "b": "TO_BE_FILLED",
+    "w0": 0.40,
+    "alpha": 0.08,
+    "beta": 0.02,
+    "pi_in": 0.80,
+    "pi_out": 0.55,
+    "pi_BS": "TO_BE_FILLED",
+    "theta": 0.80,
+    "q": 0.80,
+    "T_max": 50000,
+    "NG": "TO_BE_FILLED",
+    "NT": "TO_BE_FILLED",
+    "bootstrap_replications": 10000
+  },
+  "condition": {
+    "experiment_id": "TO_BE_FILLED",
+    "condition_id": "TO_BE_FILLED",
+    "architecture": "TO_BE_FILLED",
+    "selection_rule": "agent_first",
+    "matched_design_group": "TO_BE_FILLED"
+  },
+  "seeds": {
+    "seed_base": "TO_BE_FILLED",
+    "graph_seed_rule": "seed_base + graph_id, unless overridden by explicit graph_seed table",
+    "trajectory_seed_rule": "seed_base + 100000 * graph_id + trajectory_id, unless overridden by explicit trajectory_seed table",
+    "bootstrap_seed": "TO_BE_FILLED"
+  },
+  "required_output_fields": [
+    "graph_id",
+    "trajectory_id",
+    "network_seed",
+    "trajectory_seed",
+    "architecture",
+    "condition_id",
+    "pi_BS",
+    "b",
+    "selection_rule",
+    "theta",
+    "q",
+    "T",
+    "T_tilde",
+    "delta",
+    "final_readiness",
+    "workload_mean",
+    "workload_min",
+    "workload_max",
+    "workload_sd"
+  ],
+  "validation_status": {
+    "network_generator_tests_passed": false,
+    "matched_design_tests_passed": false,
+    "dynamics_tests_passed": false,
+    "metric_tests_passed": false,
+    "bootstrap_tests_passed": false,
+    "smoke_test_passed": false
+  }
+}
