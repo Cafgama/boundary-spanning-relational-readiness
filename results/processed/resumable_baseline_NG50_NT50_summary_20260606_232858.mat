@@ -1,0 +1,319 @@
+# Created by Octave 10.3.0, Sat Jun 06 23:28:58 2026 UTC <unknown@Tesla>
+# name: summary
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 35
+# name: architecture
+# type: sq_string
+# elements: 1
+# length: 8
+baseline
+
+
+# name: seed
+# type: scalar
+13345
+
+
+# name: NG
+# type: scalar
+50
+
+
+# name: NT
+# type: scalar
+50
+
+
+# name: n_runs
+# type: scalar
+2500
+
+
+# name: n_converged
+# type: scalar
+2500
+
+
+# name: n_nonconverged
+# type: scalar
+0
+
+
+# name: convergence_rate
+# type: scalar
+1
+
+
+# name: nonconvergence_rate
+# type: scalar
+0
+
+
+# name: T_conv_mean
+# type: scalar
+7435.7736000000004
+
+
+# name: T_conv_median
+# type: scalar
+7006.5
+
+
+# name: T_conv_p75
+# type: scalar
+8658
+
+
+# name: T_conv_p90
+# type: scalar
+10699.4
+
+
+# name: T_conv_p95
+# type: scalar
+12112.099999999999
+
+
+# name: T_conv_min
+# type: scalar
+2990
+
+
+# name: T_conv_max
+# type: scalar
+23352
+
+
+# name: T_cens_mean
+# type: scalar
+7435.7736000000004
+
+
+# name: T_cens_median
+# type: scalar
+7006.5
+
+
+# name: T_cens_p75
+# type: scalar
+8658
+
+
+# name: T_cens_p90
+# type: scalar
+10699.4
+
+
+# name: T_cens_p95
+# type: scalar
+12112.099999999999
+
+
+# name: T_cens_min
+# type: scalar
+2990
+
+
+# name: T_cens_max
+# type: scalar
+23352
+
+
+# name: final_RB_mean
+# type: scalar
+0.83768338781959684
+
+
+# name: final_RB_median
+# type: scalar
+0.83333333333333337
+
+
+# name: final_RB_min
+# type: scalar
+0.80000000000000004
+
+
+# name: final_RB_max
+# type: scalar
+0.88888888888888884
+
+
+# name: total_edges_mean
+# type: scalar
+88.819999999999993
+
+
+# name: total_edges_median
+# type: scalar
+86
+
+
+# name: mean_degree_mean
+# type: scalar
+4.4409999999999865
+
+
+# name: mean_degree_median
+# type: scalar
+4.2999999999999998
+
+
+# name: max_degree_mean
+# type: scalar
+8.8800000000000008
+
+
+# name: max_degree_median
+# type: scalar
+9
+
+
+# name: boundary_edges_mean
+# type: scalar
+12.08
+
+
+# name: boundary_edges_median
+# type: scalar
+12
+
+
+
+
+# name: P
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 21
+# name: nU
+# type: scalar
+20
+
+
+# name: nI
+# type: scalar
+20
+
+
+# name: N
+# type: scalar
+40
+
+
+# name: p_in
+# type: scalar
+0.20000000000000001
+
+
+# name: k
+# type: scalar
+12
+
+
+# name: p_out
+# type: scalar
+0.029999999999999999
+
+
+# name: b
+# type: scalar
+2
+
+
+# name: w0
+# type: scalar
+0.40000000000000002
+
+
+# name: alpha
+# type: scalar
+0.080000000000000002
+
+
+# name: beta
+# type: scalar
+0.02
+
+
+# name: pi_in
+# type: scalar
+0.80000000000000004
+
+
+# name: pi_out
+# type: scalar
+0.55000000000000004
+
+
+# name: pi_BS
+# type: scalar
+0.65000000000000002
+
+
+# name: theta
+# type: scalar
+0.80000000000000004
+
+
+# name: q
+# type: scalar
+0.80000000000000004
+
+
+# name: T_max
+# type: scalar
+50000
+
+
+# name: NG_debug
+# type: scalar
+10
+
+
+# name: NT_debug
+# type: scalar
+20
+
+
+# name: NG_full
+# type: scalar
+100
+
+
+# name: NT_full
+# type: scalar
+100
+
+
+# name: seed
+# type: scalar
+12345
+
+
+
+
+# name: architecture
+# type: sq_string
+# elements: 1
+# length: 8
+baseline
+
+
+# name: NG
+# type: scalar
+50
+
+
+# name: NT
+# type: scalar
+50
+
+
+# name: elapsed_time
+# type: scalar
+5051.2947058677673
+
+

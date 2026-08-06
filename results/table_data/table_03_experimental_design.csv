@@ -1,0 +1,7 @@
+table_id,row_order,experiment,conditions,managerial_question
+table_03,1,Baseline architecture comparison,Baseline modular network; random bridging; boundary spanning,"Are random cross-boundary ties sufficient, or does deliberate boundary-spanning design matter?"
+table_03,2,Mechanism decomposition,RB_low; BS_low; BS_high,"Does boundary spanning work through concentrated allocation, translation capability, or both?"
+table_03,3,Translation-capability grid,"pi_BS equals 0.55, 0.60, 0.65, and 0.70",How much translation capability is needed to reduce relational delay?
+table_03,4,Boundary-spanner load grid,"b equals 1, 2, 4, and 6",Does distributing interface work across more boundary spanners reduce bottleneck risk?
+table_03,5,Selection-rule robustness,Agent-first interaction selection; edge-uniform interaction selection,Does the bottleneck mechanism depend on scarce actor-level interaction capacity?
+table_03,6,Readiness-threshold robustness,Alternative values of theta and q,Does the mechanism depend on the baseline readiness definition?

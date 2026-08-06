@@ -1,0 +1,341 @@
+# Created by Octave 10.3.0, Thu Jun 18 12:46:33 2026 UTC <unknown@Tesla>
+# name: summary
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 35
+# name: architecture
+# type: sq_string
+# elements: 1
+# length: 9
+LOAD_b_06
+
+
+# name: seed
+# type: scalar
+25345
+
+
+# name: NG
+# type: scalar
+50
+
+
+# name: NT
+# type: scalar
+50
+
+
+# name: n_runs
+# type: scalar
+2500
+
+
+# name: n_converged
+# type: scalar
+2500
+
+
+# name: n_nonconverged
+# type: scalar
+0
+
+
+# name: convergence_rate
+# type: scalar
+1
+
+
+# name: nonconvergence_rate
+# type: scalar
+0
+
+
+# name: T_conv_mean
+# type: scalar
+3966.8980000000001
+
+
+# name: T_conv_median
+# type: scalar
+3887
+
+
+# name: T_conv_p75
+# type: scalar
+4409.5
+
+
+# name: T_conv_p90
+# type: scalar
+4959.1000000000004
+
+
+# name: T_conv_p95
+# type: scalar
+5291.0999999999985
+
+
+# name: T_conv_min
+# type: scalar
+2005
+
+
+# name: T_conv_max
+# type: scalar
+8811
+
+
+# name: T_cens_mean
+# type: scalar
+3966.8980000000001
+
+
+# name: T_cens_median
+# type: scalar
+3887
+
+
+# name: T_cens_p75
+# type: scalar
+4409.5
+
+
+# name: T_cens_p90
+# type: scalar
+4959.1000000000004
+
+
+# name: T_cens_p95
+# type: scalar
+5291.0999999999985
+
+
+# name: T_cens_min
+# type: scalar
+2005
+
+
+# name: T_cens_max
+# type: scalar
+8811
+
+
+# name: final_RB_mean
+# type: scalar
+0.83333333333330606
+
+
+# name: final_RB_median
+# type: scalar
+0.83333333333333337
+
+
+# name: final_RB_min
+# type: scalar
+0.83333333333333337
+
+
+# name: final_RB_max
+# type: scalar
+0.83333333333333337
+
+
+# name: total_edges_mean
+# type: scalar
+86.599999999999994
+
+
+# name: total_edges_median
+# type: scalar
+87
+
+
+# name: mean_degree_mean
+# type: scalar
+4.3300000000000258
+
+
+# name: mean_degree_median
+# type: scalar
+4.3499999999999996
+
+
+# name: max_degree_mean
+# type: scalar
+8.7400000000000002
+
+
+# name: max_degree_median
+# type: scalar
+8.5
+
+
+# name: boundary_edges_mean
+# type: scalar
+12
+
+
+# name: boundary_edges_median
+# type: scalar
+12
+
+
+
+
+# name: P
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 21
+# name: nU
+# type: scalar
+20
+
+
+# name: nI
+# type: scalar
+20
+
+
+# name: N
+# type: scalar
+40
+
+
+# name: p_in
+# type: scalar
+0.20000000000000001
+
+
+# name: k
+# type: scalar
+12
+
+
+# name: p_out
+# type: scalar
+0.029999999999999999
+
+
+# name: b
+# type: scalar
+6
+
+
+# name: w0
+# type: scalar
+0.40000000000000002
+
+
+# name: alpha
+# type: scalar
+0.080000000000000002
+
+
+# name: beta
+# type: scalar
+0.02
+
+
+# name: pi_in
+# type: scalar
+0.80000000000000004
+
+
+# name: pi_out
+# type: scalar
+0.55000000000000004
+
+
+# name: pi_BS
+# type: scalar
+0.65000000000000002
+
+
+# name: theta
+# type: scalar
+0.80000000000000004
+
+
+# name: q
+# type: scalar
+0.80000000000000004
+
+
+# name: T_max
+# type: scalar
+50000
+
+
+# name: NG_debug
+# type: scalar
+10
+
+
+# name: NT_debug
+# type: scalar
+20
+
+
+# name: NG_full
+# type: scalar
+100
+
+
+# name: NT_full
+# type: scalar
+100
+
+
+# name: seed
+# type: scalar
+12345
+
+
+
+
+# name: condition_label
+# type: sq_string
+# elements: 1
+# length: 9
+LOAD_b_06
+
+
+# name: architecture
+# type: sq_string
+# elements: 1
+# length: 17
+boundary_spanning
+
+
+# name: b_value
+# type: scalar
+6
+
+
+# name: load_per_spanner
+# type: scalar
+1
+
+
+# name: NG
+# type: scalar
+50
+
+
+# name: NT
+# type: scalar
+50
+
+
+# name: seed_base
+# type: scalar
+25345
+
+
+# name: elapsed_time
+# type: scalar
+5082.7237479686737
+
+

@@ -1,0 +1,8 @@
+table_id,row_order,construct,formal_representation,managerial_interpretation
+table_01,1,Relational confidence,"$w_{ab}(t)\in[0,1]$",Reliability of a recurring working relation between two agents.
+table_01,2,Successful interaction,$x_{ab}(t)=1$,"An interaction that reinforces the working relation by improving understanding, alignment, or problem solving."
+table_01,3,Failed interaction,$x_{ab}(t)=0$,"An interaction that weakens the working relation through misunderstanding, friction, or misalignment."
+table_01,4,Boundary readiness,$R_B(t)$,Fraction of cross-boundary ties that have reached sufficient relational confidence.
+table_01,5,First-passage time,$T=\inf\{t:R_B(t)\geq q\}$,Time required for the collaboration boundary to become relationally ready.
+table_01,6,Translation advantage,$\pi_{BS}>\pi_{out}$,Higher probability that boundary-spanning interactions succeed relative to ordinary cross-boundary interactions.
+table_01,7,Boundary-spanner load,$k/(2b)$,Approximate amount of cross-boundary work carried by each boundary spanner.

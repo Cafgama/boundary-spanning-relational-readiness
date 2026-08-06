@@ -1,0 +1,717 @@
+# Created by Octave 10.3.0, Thu Jun 04 22:20:02 2026 UTC <unknown@Tesla>
+# name: all_summaries
+# type: cell
+# rows: 3
+# columns: 1
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 35
+# name: architecture
+# type: sq_string
+# elements: 1
+# length: 8
+baseline
+
+
+# name: seed
+# type: scalar
+13345
+
+
+# name: NG
+# type: scalar
+10
+
+
+# name: NT
+# type: scalar
+20
+
+
+# name: n_runs
+# type: scalar
+200
+
+
+# name: n_converged
+# type: scalar
+200
+
+
+# name: n_nonconverged
+# type: scalar
+0
+
+
+# name: convergence_rate
+# type: scalar
+1
+
+
+# name: nonconvergence_rate
+# type: scalar
+0
+
+
+# name: T_conv_mean
+# type: scalar
+7521.1049999999996
+
+
+# name: T_conv_median
+# type: scalar
+6962.5
+
+
+# name: T_conv_p75
+# type: scalar
+8816
+
+
+# name: T_conv_p90
+# type: scalar
+11308.799999999999
+
+
+# name: T_conv_p95
+# type: scalar
+12269.049999999999
+
+
+# name: T_conv_min
+# type: scalar
+3395
+
+
+# name: T_conv_max
+# type: scalar
+18216
+
+
+# name: T_cens_mean
+# type: scalar
+7521.1049999999996
+
+
+# name: T_cens_median
+# type: scalar
+6962.5
+
+
+# name: T_cens_p75
+# type: scalar
+8816
+
+
+# name: T_cens_p90
+# type: scalar
+11308.799999999999
+
+
+# name: T_cens_p95
+# type: scalar
+12269.049999999999
+
+
+# name: T_cens_min
+# type: scalar
+3395
+
+
+# name: T_cens_max
+# type: scalar
+18216
+
+
+# name: final_RB_mean
+# type: scalar
+0.83460041592394374
+
+
+# name: final_RB_median
+# type: scalar
+0.82085561497326198
+
+
+# name: final_RB_min
+# type: scalar
+0.80000000000000004
+
+
+# name: final_RB_max
+# type: scalar
+0.88888888888888884
+
+
+# name: total_edges_mean
+# type: scalar
+88.599999999999994
+
+
+# name: total_edges_median
+# type: scalar
+90.5
+
+
+# name: mean_degree_mean
+# type: scalar
+4.4300000000000059
+
+
+# name: mean_degree_median
+# type: scalar
+4.5250000000000004
+
+
+# name: max_degree_mean
+# type: scalar
+9.4000000000000004
+
+
+# name: max_degree_median
+# type: scalar
+9.5
+
+
+# name: boundary_edges_mean
+# type: scalar
+12.4
+
+
+# name: boundary_edges_median
+# type: scalar
+10.5
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 35
+# name: architecture
+# type: sq_string
+# elements: 1
+# length: 15
+random_bridging
+
+
+# name: seed
+# type: scalar
+14345
+
+
+# name: NG
+# type: scalar
+10
+
+
+# name: NT
+# type: scalar
+20
+
+
+# name: n_runs
+# type: scalar
+200
+
+
+# name: n_converged
+# type: scalar
+200
+
+
+# name: n_nonconverged
+# type: scalar
+0
+
+
+# name: convergence_rate
+# type: scalar
+1
+
+
+# name: nonconvergence_rate
+# type: scalar
+0
+
+
+# name: T_conv_mean
+# type: scalar
+6943.6999999999998
+
+
+# name: T_conv_median
+# type: scalar
+6613
+
+
+# name: T_conv_p75
+# type: scalar
+7817
+
+
+# name: T_conv_p90
+# type: scalar
+9522.3999999999996
+
+
+# name: T_conv_p95
+# type: scalar
+10853.999999999995
+
+
+# name: T_conv_min
+# type: scalar
+3583
+
+
+# name: T_conv_max
+# type: scalar
+14876
+
+
+# name: T_cens_mean
+# type: scalar
+6943.6999999999998
+
+
+# name: T_cens_median
+# type: scalar
+6613
+
+
+# name: T_cens_p75
+# type: scalar
+7817
+
+
+# name: T_cens_p90
+# type: scalar
+9522.3999999999996
+
+
+# name: T_cens_p95
+# type: scalar
+10853.999999999995
+
+
+# name: T_cens_min
+# type: scalar
+3583
+
+
+# name: T_cens_max
+# type: scalar
+14876
+
+
+# name: final_RB_mean
+# type: scalar
+0.83333333333333415
+
+
+# name: final_RB_median
+# type: scalar
+0.83333333333333337
+
+
+# name: final_RB_min
+# type: scalar
+0.83333333333333337
+
+
+# name: final_RB_max
+# type: scalar
+0.83333333333333337
+
+
+# name: total_edges_mean
+# type: scalar
+85.299999999999997
+
+
+# name: total_edges_median
+# type: scalar
+87.5
+
+
+# name: mean_degree_mean
+# type: scalar
+4.2650000000000032
+
+
+# name: mean_degree_median
+# type: scalar
+4.375
+
+
+# name: max_degree_mean
+# type: scalar
+9.1999999999999993
+
+
+# name: max_degree_median
+# type: scalar
+9.5
+
+
+# name: boundary_edges_mean
+# type: scalar
+12
+
+
+# name: boundary_edges_median
+# type: scalar
+12
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 35
+# name: architecture
+# type: sq_string
+# elements: 1
+# length: 17
+boundary_spanning
+
+
+# name: seed
+# type: scalar
+15345
+
+
+# name: NG
+# type: scalar
+10
+
+
+# name: NT
+# type: scalar
+20
+
+
+# name: n_runs
+# type: scalar
+200
+
+
+# name: n_converged
+# type: scalar
+200
+
+
+# name: n_nonconverged
+# type: scalar
+0
+
+
+# name: convergence_rate
+# type: scalar
+1
+
+
+# name: nonconvergence_rate
+# type: scalar
+0
+
+
+# name: T_conv_mean
+# type: scalar
+4730.6300000000001
+
+
+# name: T_conv_median
+# type: scalar
+4555.5
+
+
+# name: T_conv_p75
+# type: scalar
+5245.75
+
+
+# name: T_conv_p90
+# type: scalar
+6000.4000000000005
+
+
+# name: T_conv_p95
+# type: scalar
+6584.2999999999993
+
+
+# name: T_conv_min
+# type: scalar
+2324
+
+
+# name: T_conv_max
+# type: scalar
+9752
+
+
+# name: T_cens_mean
+# type: scalar
+4730.6300000000001
+
+
+# name: T_cens_median
+# type: scalar
+4555.5
+
+
+# name: T_cens_p75
+# type: scalar
+5245.75
+
+
+# name: T_cens_p90
+# type: scalar
+6000.4000000000005
+
+
+# name: T_cens_p95
+# type: scalar
+6584.2999999999993
+
+
+# name: T_cens_min
+# type: scalar
+2324
+
+
+# name: T_cens_max
+# type: scalar
+9752
+
+
+# name: final_RB_mean
+# type: scalar
+0.83333333333333415
+
+
+# name: final_RB_median
+# type: scalar
+0.83333333333333337
+
+
+# name: final_RB_min
+# type: scalar
+0.83333333333333337
+
+
+# name: final_RB_max
+# type: scalar
+0.83333333333333337
+
+
+# name: total_edges_mean
+# type: scalar
+93.599999999999994
+
+
+# name: total_edges_median
+# type: scalar
+95
+
+
+# name: mean_degree_mean
+# type: scalar
+4.6799999999999962
+
+
+# name: mean_degree_median
+# type: scalar
+4.75
+
+
+# name: max_degree_mean
+# type: scalar
+10.699999999999999
+
+
+# name: max_degree_median
+# type: scalar
+10.5
+
+
+# name: boundary_edges_mean
+# type: scalar
+12
+
+
+# name: boundary_edges_median
+# type: scalar
+12
+
+
+
+
+
+
+
+# name: P
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 21
+# name: nU
+# type: scalar
+20
+
+
+# name: nI
+# type: scalar
+20
+
+
+# name: N
+# type: scalar
+40
+
+
+# name: p_in
+# type: scalar
+0.20000000000000001
+
+
+# name: k
+# type: scalar
+12
+
+
+# name: p_out
+# type: scalar
+0.029999999999999999
+
+
+# name: b
+# type: scalar
+2
+
+
+# name: w0
+# type: scalar
+0.40000000000000002
+
+
+# name: alpha
+# type: scalar
+0.080000000000000002
+
+
+# name: beta
+# type: scalar
+0.02
+
+
+# name: pi_in
+# type: scalar
+0.80000000000000004
+
+
+# name: pi_out
+# type: scalar
+0.55000000000000004
+
+
+# name: pi_BS
+# type: scalar
+0.65000000000000002
+
+
+# name: theta
+# type: scalar
+0.80000000000000004
+
+
+# name: q
+# type: scalar
+0.80000000000000004
+
+
+# name: T_max
+# type: scalar
+50000
+
+
+# name: NG_debug
+# type: scalar
+10
+
+
+# name: NT_debug
+# type: scalar
+20
+
+
+# name: NG_full
+# type: scalar
+100
+
+
+# name: NT_full
+# type: scalar
+100
+
+
+# name: seed
+# type: scalar
+12345
+
+
+
+
+# name: architectures
+# type: cell
+# rows: 1
+# columns: 3
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 8
+baseline
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 15
+random_bridging
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 17
+boundary_spanning
+
+
+
+
+
+# name: NG
+# type: scalar
+10
+
+
+# name: NT
+# type: scalar
+20
+
+
+# name: elapsed_time
+# type: scalar
+13443.15836596489
+
+

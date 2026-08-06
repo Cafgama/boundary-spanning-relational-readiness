@@ -1,0 +1,18 @@
+table_id,row_order,parameter,meaning,value,managerial_rationale
+table_02,1,$n_U$,University agents,20,Symmetric modular R and D collaboration setting.
+table_02,2,$n_I$,Industry agents,20,Symmetric modular R and D collaboration setting.
+table_02,3,$p_{in}$,Internal tie probability,0.20,Within-module interaction is more frequent than cross-boundary interaction.
+table_02,4,$p_{out}$,Baseline cross-boundary tie probability,0.03,Cross-boundary ties are sparse in unmanaged modular collaboration.
+table_02,5,$k$,Cross-boundary tie budget,12,Fixed scarce interface capacity in controlled architectures.
+table_02,6,$b$,Boundary spanners per side,2,Concentrated boundary-spanning role allocation.
+table_02,7,$w_0$,Initial relational confidence,0.40,Initial relations are neither absent nor ready.
+table_02,8,$\alpha$,Reinforcement rate,0.08,Successful interactions increase relational confidence.
+table_02,9,$\beta$,Decay rate,0.02,Failed interactions erode relational confidence.
+table_02,10,$\pi_{in}$,Internal success probability,0.80,Interactions within the same module are easier.
+table_02,11,$\pi_{out}$,Ordinary cross-boundary success probability,0.55,Cross-boundary interactions are more difficult.
+table_02,12,$\pi_{BS}$,Boundary-spanning success probability,0.65,Boundary spanners have a modest translation advantage.
+table_02,13,$\theta$,Tie-level readiness threshold,0.80,A tie must reach high relational confidence to count as ready.
+table_02,14,$q$,Boundary-level readiness threshold,0.80,The boundary is ready when most cross-boundary ties are ready.
+table_02,15,$T_{\max}$,Simulation horizon,50000,Maximum number of interaction events per trajectory.
+table_02,16,$NG$,Graph realizations,50,Independent network structures per condition.
+table_02,17,$NT$,Trajectories per graph,50,Stochastic interaction histories per network structure.

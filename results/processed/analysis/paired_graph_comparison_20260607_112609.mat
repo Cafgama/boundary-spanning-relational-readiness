@@ -1,0 +1,2016 @@
+# Created by Octave 10.3.0, Sun Jun 07 11:26:09 2026 UTC <unknown@Tesla>
+# name: all_comparisons
+# type: cell
+# rows: 3
+# columns: 4
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 19
+# name: architecture_x
+# type: sq_string
+# elements: 1
+# length: 8
+baseline
+
+
+# name: architecture_y
+# type: sq_string
+# elements: 1
+# length: 15
+random_bridging
+
+
+# name: metric
+# type: sq_string
+# elements: 1
+# length: 11
+T_cens_mean
+
+
+# name: n_pairs
+# type: scalar
+50
+
+
+# name: mean_x
+# type: scalar
+7435.7735999999995
+
+
+# name: mean_y
+# type: scalar
+7280.1836000000012
+
+
+# name: mean_difference
+# type: scalar
+155.59000000000006
+
+
+# name: median_difference
+# type: scalar
+79.220000000000709
+
+
+# name: relative_reduction
+# type: scalar
+0.020924520886434511
+
+
+# name: ci_lower
+# type: scalar
+-197.14640000000003
+
+
+# name: ci_upper
+# type: scalar
+524.76559999999995
+
+
+# name: n_x_greater
+# type: scalar
+26
+
+
+# name: n_x_lower
+# type: scalar
+24
+
+
+# name: n_equal
+# type: scalar
+0
+
+
+# name: fraction_y_lower
+# type: scalar
+0.52000000000000002
+
+
+# name: min_difference
+# type: scalar
+-2537.1800000000003
+
+
+# name: max_difference
+# type: scalar
+3263.2600000000011
+
+
+# name: graph_ids
+# type: matrix
+# rows: 50
+# columns: 1
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+
+
+# name: comparison_label
+# type: sq_string
+# elements: 1
+# length: 21
+baseline_minus_random
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 19
+# name: architecture_x
+# type: sq_string
+# elements: 1
+# length: 15
+random_bridging
+
+
+# name: architecture_y
+# type: sq_string
+# elements: 1
+# length: 17
+boundary_spanning
+
+
+# name: metric
+# type: sq_string
+# elements: 1
+# length: 11
+T_cens_mean
+
+
+# name: n_pairs
+# type: scalar
+50
+
+
+# name: mean_x
+# type: scalar
+7280.1836000000012
+
+
+# name: mean_y
+# type: scalar
+4576.032400000001
+
+
+# name: mean_difference
+# type: scalar
+2704.1511999999998
+
+
+# name: median_difference
+# type: scalar
+2923.1700000000001
+
+
+# name: relative_reduction
+# type: scalar
+0.3714399730248561
+
+
+# name: ci_lower
+# type: scalar
+2467.5628000000002
+
+
+# name: ci_upper
+# type: scalar
+2932.9056
+
+
+# name: n_x_greater
+# type: scalar
+50
+
+
+# name: n_x_lower
+# type: scalar
+0
+
+
+# name: n_equal
+# type: scalar
+0
+
+
+# name: fraction_y_lower
+# type: scalar
+1
+
+
+# name: min_difference
+# type: scalar
+897.14000000000033
+
+
+# name: max_difference
+# type: scalar
+4897.6000000000004
+
+
+# name: graph_ids
+# type: matrix
+# rows: 50
+# columns: 1
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+
+
+# name: comparison_label
+# type: sq_string
+# elements: 1
+# length: 21
+random_minus_boundary
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 19
+# name: architecture_x
+# type: sq_string
+# elements: 1
+# length: 8
+baseline
+
+
+# name: architecture_y
+# type: sq_string
+# elements: 1
+# length: 17
+boundary_spanning
+
+
+# name: metric
+# type: sq_string
+# elements: 1
+# length: 11
+T_cens_mean
+
+
+# name: n_pairs
+# type: scalar
+50
+
+
+# name: mean_x
+# type: scalar
+7435.7735999999995
+
+
+# name: mean_y
+# type: scalar
+4576.032400000001
+
+
+# name: mean_difference
+# type: scalar
+2859.7411999999995
+
+
+# name: median_difference
+# type: scalar
+2767.1900000000001
+
+
+# name: relative_reduction
+# type: scalar
+0.38459229043767534
+
+
+# name: ci_lower
+# type: scalar
+2539.0151999999998
+
+
+# name: ci_upper
+# type: scalar
+3177.0339999999992
+
+
+# name: n_x_greater
+# type: scalar
+50
+
+
+# name: n_x_lower
+# type: scalar
+0
+
+
+# name: n_equal
+# type: scalar
+0
+
+
+# name: fraction_y_lower
+# type: scalar
+1
+
+
+# name: min_difference
+# type: scalar
+648.27999999999975
+
+
+# name: max_difference
+# type: scalar
+5307.0600000000004
+
+
+# name: graph_ids
+# type: matrix
+# rows: 50
+# columns: 1
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+
+
+# name: comparison_label
+# type: sq_string
+# elements: 1
+# length: 23
+baseline_minus_boundary
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 19
+# name: architecture_x
+# type: sq_string
+# elements: 1
+# length: 8
+baseline
+
+
+# name: architecture_y
+# type: sq_string
+# elements: 1
+# length: 15
+random_bridging
+
+
+# name: metric
+# type: sq_string
+# elements: 1
+# length: 13
+T_cens_median
+
+
+# name: n_pairs
+# type: scalar
+50
+
+
+# name: mean_x
+# type: scalar
+7048.04
+
+
+# name: mean_y
+# type: scalar
+7008.3500000000004
+
+
+# name: mean_difference
+# type: scalar
+39.689999999999998
+
+
+# name: median_difference
+# type: scalar
+-175
+
+
+# name: relative_reduction
+# type: scalar
+0.0056313528300065835
+
+
+# name: ci_lower
+# type: scalar
+-282.01999999999998
+
+
+# name: ci_upper
+# type: scalar
+364.82999999999998
+
+
+# name: n_x_greater
+# type: scalar
+22
+
+
+# name: n_x_lower
+# type: scalar
+28
+
+
+# name: n_equal
+# type: scalar
+0
+
+
+# name: fraction_y_lower
+# type: scalar
+0.44
+
+
+# name: min_difference
+# type: scalar
+-2340
+
+
+# name: max_difference
+# type: scalar
+3059
+
+
+# name: graph_ids
+# type: matrix
+# rows: 50
+# columns: 1
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+
+
+# name: comparison_label
+# type: sq_string
+# elements: 1
+# length: 21
+baseline_minus_random
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 19
+# name: architecture_x
+# type: sq_string
+# elements: 1
+# length: 15
+random_bridging
+
+
+# name: architecture_y
+# type: sq_string
+# elements: 1
+# length: 17
+boundary_spanning
+
+
+# name: metric
+# type: sq_string
+# elements: 1
+# length: 13
+T_cens_median
+
+
+# name: n_pairs
+# type: scalar
+50
+
+
+# name: mean_x
+# type: scalar
+7008.3500000000004
+
+
+# name: mean_y
+# type: scalar
+4513.4499999999998
+
+
+# name: mean_difference
+# type: scalar
+2494.9000000000001
+
+
+# name: median_difference
+# type: scalar
+2654
+
+
+# name: relative_reduction
+# type: scalar
+0.35598964092832125
+
+
+# name: ci_lower
+# type: scalar
+2258.5599999999999
+
+
+# name: ci_upper
+# type: scalar
+2717.0799999999999
+
+
+# name: n_x_greater
+# type: scalar
+50
+
+
+# name: n_x_lower
+# type: scalar
+0
+
+
+# name: n_equal
+# type: scalar
+0
+
+
+# name: fraction_y_lower
+# type: scalar
+1
+
+
+# name: min_difference
+# type: scalar
+668.5
+
+
+# name: max_difference
+# type: scalar
+4076
+
+
+# name: graph_ids
+# type: matrix
+# rows: 50
+# columns: 1
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+
+
+# name: comparison_label
+# type: sq_string
+# elements: 1
+# length: 21
+random_minus_boundary
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 19
+# name: architecture_x
+# type: sq_string
+# elements: 1
+# length: 8
+baseline
+
+
+# name: architecture_y
+# type: sq_string
+# elements: 1
+# length: 17
+boundary_spanning
+
+
+# name: metric
+# type: sq_string
+# elements: 1
+# length: 13
+T_cens_median
+
+
+# name: n_pairs
+# type: scalar
+50
+
+
+# name: mean_x
+# type: scalar
+7048.04
+
+
+# name: mean_y
+# type: scalar
+4513.4499999999998
+
+
+# name: mean_difference
+# type: scalar
+2534.5900000000001
+
+
+# name: median_difference
+# type: scalar
+2405
+
+
+# name: relative_reduction
+# type: scalar
+0.35961629048643312
+
+
+# name: ci_lower
+# type: scalar
+2243.9899999999998
+
+
+# name: ci_upper
+# type: scalar
+2839.8099999999999
+
+
+# name: n_x_greater
+# type: scalar
+50
+
+
+# name: n_x_lower
+# type: scalar
+0
+
+
+# name: n_equal
+# type: scalar
+0
+
+
+# name: fraction_y_lower
+# type: scalar
+1
+
+
+# name: min_difference
+# type: scalar
+199
+
+
+# name: max_difference
+# type: scalar
+5203.5
+
+
+# name: graph_ids
+# type: matrix
+# rows: 50
+# columns: 1
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+
+
+# name: comparison_label
+# type: sq_string
+# elements: 1
+# length: 23
+baseline_minus_boundary
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 19
+# name: architecture_x
+# type: sq_string
+# elements: 1
+# length: 8
+baseline
+
+
+# name: architecture_y
+# type: sq_string
+# elements: 1
+# length: 15
+random_bridging
+
+
+# name: metric
+# type: sq_string
+# elements: 1
+# length: 10
+T_cens_p90
+
+
+# name: n_pairs
+# type: scalar
+50
+
+
+# name: mean_x
+# type: scalar
+9925.5979999999981
+
+
+# name: mean_y
+# type: scalar
+9653.601999999999
+
+
+# name: mean_difference
+# type: scalar
+271.99599999999992
+
+
+# name: median_difference
+# type: scalar
+99.850000000000364
+
+
+# name: relative_reduction
+# type: scalar
+0.027403487427155447
+
+
+# name: ci_lower
+# type: scalar
+-293.52200000000033
+
+
+# name: ci_upper
+# type: scalar
+841.99999999999989
+
+
+# name: n_x_greater
+# type: scalar
+26
+
+
+# name: n_x_lower
+# type: scalar
+24
+
+
+# name: n_equal
+# type: scalar
+0
+
+
+# name: fraction_y_lower
+# type: scalar
+0.52000000000000002
+
+
+# name: min_difference
+# type: scalar
+-3365.9000000000005
+
+
+# name: max_difference
+# type: scalar
+6004.4000000000005
+
+
+# name: graph_ids
+# type: matrix
+# rows: 50
+# columns: 1
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+
+
+# name: comparison_label
+# type: sq_string
+# elements: 1
+# length: 21
+baseline_minus_random
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 19
+# name: architecture_x
+# type: sq_string
+# elements: 1
+# length: 15
+random_bridging
+
+
+# name: architecture_y
+# type: sq_string
+# elements: 1
+# length: 17
+boundary_spanning
+
+
+# name: metric
+# type: sq_string
+# elements: 1
+# length: 10
+T_cens_p90
+
+
+# name: n_pairs
+# type: scalar
+50
+
+
+# name: mean_x
+# type: scalar
+9653.601999999999
+
+
+# name: mean_y
+# type: scalar
+5444.7439999999988
+
+
+# name: mean_difference
+# type: scalar
+4208.8580000000002
+
+
+# name: median_difference
+# type: scalar
+4521.4000000000015
+
+
+# name: relative_reduction
+# type: scalar
+0.43598834921928631
+
+
+# name: ci_lower
+# type: scalar
+3852.2600000000002
+
+
+# name: ci_upper
+# type: scalar
+4566.2479999999996
+
+
+# name: n_x_greater
+# type: scalar
+50
+
+
+# name: n_x_lower
+# type: scalar
+0
+
+
+# name: n_equal
+# type: scalar
+0
+
+
+# name: fraction_y_lower
+# type: scalar
+1
+
+
+# name: min_difference
+# type: scalar
+1617.1999999999989
+
+
+# name: max_difference
+# type: scalar
+7805
+
+
+# name: graph_ids
+# type: matrix
+# rows: 50
+# columns: 1
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+
+
+# name: comparison_label
+# type: sq_string
+# elements: 1
+# length: 21
+random_minus_boundary
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 19
+# name: architecture_x
+# type: sq_string
+# elements: 1
+# length: 8
+baseline
+
+
+# name: architecture_y
+# type: sq_string
+# elements: 1
+# length: 17
+boundary_spanning
+
+
+# name: metric
+# type: sq_string
+# elements: 1
+# length: 10
+T_cens_p90
+
+
+# name: n_pairs
+# type: scalar
+50
+
+
+# name: mean_x
+# type: scalar
+9925.5979999999981
+
+
+# name: mean_y
+# type: scalar
+5444.7439999999988
+
+
+# name: mean_difference
+# type: scalar
+4480.8540000000003
+
+
+# name: median_difference
+# type: scalar
+4433.0500000000002
+
+
+# name: relative_reduction
+# type: scalar
+0.45144423540022477
+
+
+# name: ci_lower
+# type: scalar
+3998.9200000000001
+
+
+# name: ci_upper
+# type: scalar
+4963.9680000000008
+
+
+# name: n_x_greater
+# type: scalar
+50
+
+
+# name: n_x_lower
+# type: scalar
+0
+
+
+# name: n_equal
+# type: scalar
+0
+
+
+# name: fraction_y_lower
+# type: scalar
+1
+
+
+# name: min_difference
+# type: scalar
+1230.5
+
+
+# name: max_difference
+# type: scalar
+8115.4000000000015
+
+
+# name: graph_ids
+# type: matrix
+# rows: 50
+# columns: 1
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+
+
+# name: comparison_label
+# type: sq_string
+# elements: 1
+# length: 23
+baseline_minus_boundary
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 19
+# name: architecture_x
+# type: sq_string
+# elements: 1
+# length: 8
+baseline
+
+
+# name: architecture_y
+# type: sq_string
+# elements: 1
+# length: 15
+random_bridging
+
+
+# name: metric
+# type: sq_string
+# elements: 1
+# length: 10
+T_cens_p95
+
+
+# name: n_pairs
+# type: scalar
+50
+
+
+# name: mean_x
+# type: scalar
+11016.907999999996
+
+
+# name: mean_y
+# type: scalar
+10592.568999999996
+
+
+# name: mean_difference
+# type: scalar
+424.3389999999992
+
+
+# name: median_difference
+# type: scalar
+488.37499999999909
+
+
+# name: relative_reduction
+# type: scalar
+0.038517068491449695
+
+
+# name: ci_lower
+# type: scalar
+-250.75800000000004
+
+
+# name: ci_upper
+# type: scalar
+1109.241
+
+
+# name: n_x_greater
+# type: scalar
+28
+
+
+# name: n_x_lower
+# type: scalar
+22
+
+
+# name: n_equal
+# type: scalar
+0
+
+
+# name: fraction_y_lower
+# type: scalar
+0.56000000000000005
+
+
+# name: min_difference
+# type: scalar
+-5129.3499999999949
+
+
+# name: max_difference
+# type: scalar
+6820.0500000000002
+
+
+# name: graph_ids
+# type: matrix
+# rows: 50
+# columns: 1
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+
+
+# name: comparison_label
+# type: sq_string
+# elements: 1
+# length: 21
+baseline_minus_random
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 19
+# name: architecture_x
+# type: sq_string
+# elements: 1
+# length: 15
+random_bridging
+
+
+# name: architecture_y
+# type: sq_string
+# elements: 1
+# length: 17
+boundary_spanning
+
+
+# name: metric
+# type: sq_string
+# elements: 1
+# length: 10
+T_cens_p95
+
+
+# name: n_pairs
+# type: scalar
+50
+
+
+# name: mean_x
+# type: scalar
+10592.568999999996
+
+
+# name: mean_y
+# type: scalar
+5743.5369999999994
+
+
+# name: mean_difference
+# type: scalar
+4849.0319999999983
+
+
+# name: median_difference
+# type: scalar
+5008.6749999999993
+
+
+# name: relative_reduction
+# type: scalar
+0.45777676784545829
+
+
+# name: ci_lower
+# type: scalar
+4394.9009999999998
+
+
+# name: ci_upper
+# type: scalar
+5331.8259999999982
+
+
+# name: n_x_greater
+# type: scalar
+50
+
+
+# name: n_x_lower
+# type: scalar
+0
+
+
+# name: n_equal
+# type: scalar
+0
+
+
+# name: fraction_y_lower
+# type: scalar
+1
+
+
+# name: min_difference
+# type: scalar
+1280.1499999999996
+
+
+# name: max_difference
+# type: scalar
+11317.899999999994
+
+
+# name: graph_ids
+# type: matrix
+# rows: 50
+# columns: 1
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+
+
+# name: comparison_label
+# type: sq_string
+# elements: 1
+# length: 21
+random_minus_boundary
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 19
+# name: architecture_x
+# type: sq_string
+# elements: 1
+# length: 8
+baseline
+
+
+# name: architecture_y
+# type: sq_string
+# elements: 1
+# length: 17
+boundary_spanning
+
+
+# name: metric
+# type: sq_string
+# elements: 1
+# length: 10
+T_cens_p95
+
+
+# name: n_pairs
+# type: scalar
+50
+
+
+# name: mean_x
+# type: scalar
+11016.907999999996
+
+
+# name: mean_y
+# type: scalar
+5743.5369999999994
+
+
+# name: mean_difference
+# type: scalar
+5273.3709999999983
+
+
+# name: median_difference
+# type: scalar
+4972.4249999999975
+
+
+# name: relative_reduction
+# type: scalar
+0.47866161721601003
+
+
+# name: ci_lower
+# type: scalar
+4734.9099999999971
+
+
+# name: ci_upper
+# type: scalar
+5807.2579999999989
+
+
+# name: n_x_greater
+# type: scalar
+50
+
+
+# name: n_x_lower
+# type: scalar
+0
+
+
+# name: n_equal
+# type: scalar
+0
+
+
+# name: fraction_y_lower
+# type: scalar
+1
+
+
+# name: min_difference
+# type: scalar
+2342.4999999999964
+
+
+# name: max_difference
+# type: scalar
+9231.4500000000007
+
+
+# name: graph_ids
+# type: matrix
+# rows: 50
+# columns: 1
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+
+
+# name: comparison_label
+# type: sq_string
+# elements: 1
+# length: 23
+baseline_minus_boundary
+
+
+
+
+
+
+
+# name: metrics
+# type: cell
+# rows: 4
+# columns: 1
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 11
+T_cens_mean
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 13
+T_cens_median
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 10
+T_cens_p90
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 10
+T_cens_p95
+
+
+
+
+
+# name: comparison_labels
+# type: cell
+# rows: 3
+# columns: 1
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 21
+baseline_minus_random
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 21
+random_minus_boundary
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 23
+baseline_minus_boundary
+
+
+
+
+
+# name: n_boot
+# type: scalar
+10000
+
+
+# name: base_seed
+# type: scalar
+24680
+
+

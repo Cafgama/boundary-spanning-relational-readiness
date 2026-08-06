@@ -1,0 +1,667 @@
+# Created by Octave 10.3.0, Fri Jun 05 09:04:07 2026 UTC <unknown@Tesla>
+# name: all_results
+# type: cell
+# rows: 3
+# columns: 1
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 18
+# name: architecture
+# type: sq_string
+# elements: 1
+# length: 8
+baseline
+
+
+# name: NG
+# type: scalar
+2
+
+
+# name: NT
+# type: scalar
+3
+
+
+# name: seed
+# type: scalar
+13345
+
+
+# name: graph_id
+# type: matrix
+# rows: 6
+# columns: 1
+ 1
+ 1
+ 1
+ 2
+ 2
+ 2
+
+
+# name: trajectory_id
+# type: matrix
+# rows: 6
+# columns: 1
+ 1
+ 2
+ 3
+ 1
+ 2
+ 3
+
+
+# name: T
+# type: matrix
+# rows: 6
+# columns: 1
+ NaN
+ NaN
+ NaN
+ NaN
+ NaN
+ NaN
+
+
+# name: converged
+# type: matrix
+# rows: 6
+# columns: 1
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+
+
+# name: final_RB
+# type: matrix
+# rows: 6
+# columns: 1
+ 0.33333333333333331
+ 0.40000000000000002
+ 0.46666666666666667
+ 0.47368421052631576
+ 0.57894736842105265
+ 0.36842105263157893
+
+
+# name: final_ready
+# type: matrix
+# rows: 6
+# columns: 1
+ 5
+ 6
+ 7
+ 9
+ 11
+ 7
+
+
+# name: total_boundary_edges
+# type: matrix
+# rows: 6
+# columns: 1
+ 15
+ 15
+ 15
+ 19
+ 19
+ 19
+
+
+# name: total_edges
+# type: matrix
+# rows: 6
+# columns: 1
+ 76
+ 76
+ 76
+ 94
+ 94
+ 94
+
+
+# name: mean_degree
+# type: matrix
+# rows: 6
+# columns: 1
+ 3.7999999999999998
+ 3.7999999999999998
+ 3.7999999999999998
+ 4.7000000000000002
+ 4.7000000000000002
+ 4.7000000000000002
+
+
+# name: max_degree
+# type: matrix
+# rows: 6
+# columns: 1
+ 9
+ 9
+ 9
+ 9
+ 9
+ 9
+
+
+# name: n_runs
+# type: scalar
+6
+
+
+# name: n_converged
+# type: scalar
+0
+
+
+# name: n_nonconverged
+# type: scalar
+6
+
+
+# name: nonconvergence_rate
+# type: scalar
+1
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 18
+# name: architecture
+# type: sq_string
+# elements: 1
+# length: 15
+random_bridging
+
+
+# name: NG
+# type: scalar
+2
+
+
+# name: NT
+# type: scalar
+3
+
+
+# name: seed
+# type: scalar
+14345
+
+
+# name: graph_id
+# type: matrix
+# rows: 6
+# columns: 1
+ 1
+ 1
+ 1
+ 2
+ 2
+ 2
+
+
+# name: trajectory_id
+# type: matrix
+# rows: 6
+# columns: 1
+ 1
+ 2
+ 3
+ 1
+ 2
+ 3
+
+
+# name: T
+# type: matrix
+# rows: 6
+# columns: 1
+ NaN
+ NaN
+ NaN
+ NaN
+ NaN
+ NaN
+
+
+# name: converged
+# type: matrix
+# rows: 6
+# columns: 1
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+
+
+# name: final_RB
+# type: matrix
+# rows: 6
+# columns: 1
+ 0.58333333333333337
+ 0.41666666666666669
+ 0.33333333333333331
+ 0.66666666666666663
+ 0.5
+ 0.41666666666666669
+
+
+# name: final_ready
+# type: matrix
+# rows: 6
+# columns: 1
+ 7
+ 5
+ 4
+ 8
+ 6
+ 5
+
+
+# name: total_boundary_edges
+# type: matrix
+# rows: 6
+# columns: 1
+ 12
+ 12
+ 12
+ 12
+ 12
+ 12
+
+
+# name: total_edges
+# type: matrix
+# rows: 6
+# columns: 1
+ 88
+ 88
+ 88
+ 99
+ 99
+ 99
+
+
+# name: mean_degree
+# type: matrix
+# rows: 6
+# columns: 1
+ 4.4000000000000004
+ 4.4000000000000004
+ 4.4000000000000004
+ 4.9500000000000002
+ 4.9500000000000002
+ 4.9500000000000002
+
+
+# name: max_degree
+# type: matrix
+# rows: 6
+# columns: 1
+ 10
+ 10
+ 10
+ 8
+ 8
+ 8
+
+
+# name: n_runs
+# type: scalar
+6
+
+
+# name: n_converged
+# type: scalar
+0
+
+
+# name: n_nonconverged
+# type: scalar
+6
+
+
+# name: nonconvergence_rate
+# type: scalar
+1
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 18
+# name: architecture
+# type: sq_string
+# elements: 1
+# length: 17
+boundary_spanning
+
+
+# name: NG
+# type: scalar
+2
+
+
+# name: NT
+# type: scalar
+3
+
+
+# name: seed
+# type: scalar
+15345
+
+
+# name: graph_id
+# type: matrix
+# rows: 6
+# columns: 1
+ 1
+ 1
+ 1
+ 2
+ 2
+ 2
+
+
+# name: trajectory_id
+# type: matrix
+# rows: 6
+# columns: 1
+ 1
+ 2
+ 3
+ 1
+ 2
+ 3
+
+
+# name: T
+# type: matrix
+# rows: 6
+# columns: 1
+ 3317
+ 3689
+ 4455
+ 3655
+ 3889
+ 4321
+
+
+# name: converged
+# type: matrix
+# rows: 6
+# columns: 1
+ 1
+ 1
+ 1
+ 1
+ 1
+ 1
+
+
+# name: final_RB
+# type: matrix
+# rows: 6
+# columns: 1
+ 0.83333333333333337
+ 0.83333333333333337
+ 0.83333333333333337
+ 0.83333333333333337
+ 0.83333333333333337
+ 0.83333333333333337
+
+
+# name: final_ready
+# type: matrix
+# rows: 6
+# columns: 1
+ 10
+ 10
+ 10
+ 10
+ 10
+ 10
+
+
+# name: total_boundary_edges
+# type: matrix
+# rows: 6
+# columns: 1
+ 12
+ 12
+ 12
+ 12
+ 12
+ 12
+
+
+# name: total_edges
+# type: matrix
+# rows: 6
+# columns: 1
+ 76
+ 76
+ 76
+ 88
+ 88
+ 88
+
+
+# name: mean_degree
+# type: matrix
+# rows: 6
+# columns: 1
+ 3.7999999999999998
+ 3.7999999999999998
+ 3.7999999999999998
+ 4.4000000000000004
+ 4.4000000000000004
+ 4.4000000000000004
+
+
+# name: max_degree
+# type: matrix
+# rows: 6
+# columns: 1
+ 8
+ 8
+ 8
+ 9
+ 9
+ 9
+
+
+# name: n_runs
+# type: scalar
+6
+
+
+# name: n_converged
+# type: scalar
+6
+
+
+# name: n_nonconverged
+# type: scalar
+0
+
+
+# name: nonconvergence_rate
+# type: scalar
+0
+
+
+
+
+
+
+
+# name: P
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 21
+# name: nU
+# type: scalar
+20
+
+
+# name: nI
+# type: scalar
+20
+
+
+# name: N
+# type: scalar
+40
+
+
+# name: p_in
+# type: scalar
+0.20000000000000001
+
+
+# name: k
+# type: scalar
+12
+
+
+# name: p_out
+# type: scalar
+0.029999999999999999
+
+
+# name: b
+# type: scalar
+2
+
+
+# name: w0
+# type: scalar
+0.40000000000000002
+
+
+# name: alpha
+# type: scalar
+0.080000000000000002
+
+
+# name: beta
+# type: scalar
+0.02
+
+
+# name: pi_in
+# type: scalar
+0.80000000000000004
+
+
+# name: pi_out
+# type: scalar
+0.55000000000000004
+
+
+# name: pi_BS
+# type: scalar
+0.65000000000000002
+
+
+# name: theta
+# type: scalar
+0.80000000000000004
+
+
+# name: q
+# type: scalar
+0.80000000000000004
+
+
+# name: T_max
+# type: scalar
+5000
+
+
+# name: NG_debug
+# type: scalar
+10
+
+
+# name: NT_debug
+# type: scalar
+20
+
+
+# name: NG_full
+# type: scalar
+100
+
+
+# name: NT_full
+# type: scalar
+100
+
+
+# name: seed
+# type: scalar
+12345
+
+
+
+
+# name: architectures
+# type: cell
+# rows: 1
+# columns: 3
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 8
+baseline
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 15
+random_bridging
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 17
+boundary_spanning
+
+
+
+
+
+# name: NG
+# type: scalar
+2
+
+
+# name: NT
+# type: scalar
+3
+
+

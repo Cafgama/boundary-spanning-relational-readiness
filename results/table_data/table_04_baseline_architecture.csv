@@ -1,0 +1,4 @@
+figure_id,architecture_code,architecture_label,mean_T,median_T,p90_T,p95_T,convergence_rate,n_graphs,n_trajectories,source
+fig_03,baseline,Baseline modular network,7435.8,7048,9925.6,11016.9,1,50,2500,locked architecture summary
+fig_03,random_bridging,Random bridging,7280.2,7008.4,9653.6,10592.6,1,50,2500,locked architecture summary
+fig_03,boundary_spanning,Boundary spanning,4576,4513.5,5444.7,5743.5,1,50,2500,locked architecture summary

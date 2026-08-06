@@ -1,0 +1,4 @@
+figure_id,condition,condition_label,network_architecture,n_graphs,n_trajectories,convergence_rate,mean_T,median_T,p90_T,p95_T,max_T,total_edges,mean_degree,max_degree,boundary_edges
+fig_05,RB_low,"Random bridging, ordinary translation",random_bridging,50,2500,1,7277.5652,6981.82,9837.33,10825.56,13158.24,87.94,4.397,9,12
+fig_05,BS_low,"Boundary spanning, no translation advantage",boundary_spanning,50,2500,1,8436.8092,7991.57,11414.22,12794.1,15723.88,89.16,4.458,9.76,12
+fig_05,BS_high,"Boundary spanning, translation advantage",boundary_spanning,50,2500,1,4531.3956,4457.86,5470.83,5781.34,6447.92,89.16,4.458,9.76,12

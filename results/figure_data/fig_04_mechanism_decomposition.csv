@@ -1,0 +1,13 @@
+figure_id,comparison_code,comparison_label,statistic,condition_x,condition_y,x_value,y_value,difference_x_minus_y,ci_low,ci_high,reduction_pct,n_boot,paired,y_faster_graphs,y_faster_share
+fig_04,RB_low_minus_BS_low,Concentration without translation,Mean T,RB_low,BS_low,7277.5652,8436.8092,-1159.244,-1500.6052,-810.6522,-15.92900878,5000,0,,
+fig_04,RB_low_minus_BS_low,Concentration without translation,Median T,RB_low,BS_low,6981.82,7991.57,-1009.75,-1345.355,-669.065,-14.46256134,5000,0,,
+fig_04,RB_low_minus_BS_low,Concentration without translation,P90,RB_low,BS_low,9837.33,11414.22,-1576.89,-2094.415,-1047.995,-16.02965439,5000,0,,
+fig_04,RB_low_minus_BS_low,Concentration without translation,P95,RB_low,BS_low,10825.56,12794.1,-1968.54,-2610.33,-1326.81,-18.18418631,5000,0,,
+fig_04,BS_low_minus_BS_high,Translation capability effect,Mean T,BS_low,BS_high,8436.8092,4531.3956,3905.4136,3762.8166,4044.3852,46.2901733,5000,1,50,1
+fig_04,BS_low_minus_BS_high,Translation capability effect,Median T,BS_low,BS_high,7991.57,4457.86,3533.71,3394.54,3678.505,44.21796969,5000,1,50,1
+fig_04,BS_low_minus_BS_high,Translation capability effect,P90,BS_low,BS_high,11414.22,5470.83,5943.39,5673.48,6224.09,52.07004946,5000,1,50,1
+fig_04,BS_low_minus_BS_high,Translation capability effect,P95,BS_low,BS_high,12794.1,5781.34,7012.76,6655.24,7376.36,54.81245261,5000,1,50,1
+fig_04,RB_low_minus_BS_high,Total boundary-spanning effect,Mean T,RB_low,BS_high,7277.5652,4531.3956,2746.1696,2472.9882,3025.908,37.73473029,5000,0,,
+fig_04,RB_low_minus_BS_high,Total boundary-spanning effect,Median T,RB_low,BS_high,6981.82,4457.86,2523.96,2252.835,2790.215,36.15045934,5000,0,,
+fig_04,RB_low_minus_BS_high,Total boundary-spanning effect,P90,RB_low,BS_high,9837.33,5470.83,4366.5,3989.14,4752.64,44.38704405,5000,0,,
+fig_04,RB_low_minus_BS_high,Total boundary-spanning effect,P95,RB_low,BS_high,10825.56,5781.34,5044.22,4575.82,5506.5,46.59546481,5000,0,,

@@ -1,0 +1,35 @@
+# Octave temporary files
+octave-workspace
+*.oct
+*.mex
+*.asv
+*~
+
+# Python temporary files
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Environment and credential files
+.env
+.env.*
+*.key
+*.pem
+
+# Generated simulation outputs
+results/raw/
+results/processed/
+figures/generated/
+
+# Log and temporary files
+*.log
+*.tmp
+*.temp
+
+# Windows files
+Thumbs.db
+Desktop.ini
+
+# macOS files
+.DS_Store

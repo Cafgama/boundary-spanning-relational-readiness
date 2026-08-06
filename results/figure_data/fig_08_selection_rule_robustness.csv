@@ -1,0 +1,7 @@
+figure_id,condition,selection_rule,n_graphs,n_trajectories,convergence_rate,mean_T,median_T,p90_T,p95_T,total_edges,mean_degree,max_degree,boundary_edges
+fig_08,RB_low,agent_first,50,2500,1,7277.5652,6981.82,9837.33,10825.56,87.94,4.397,9,12
+fig_08,RB_low,edge_uniform,50,2500,1,6264.6396,5971.97,8481.47,9413.84,87.94,4.397,9,12
+fig_08,BS_low,agent_first,50,2500,1,8436.8092,7991.57,11414.22,12794.1,89.16,4.458,9.76,12
+fig_08,BS_low,edge_uniform,50,2500,1,6309.7932,5983.22,8596.51,9448.52,89.16,4.458,9.76,12
+fig_08,BS_high,agent_first,50,2500,1,4531.3956,4457.86,5470.83,5781.34,89.16,4.458,9.76,12
+fig_08,BS_high,edge_uniform,50,2500,1,3383.1532,3348.06,4029.71,4281.06,89.16,4.458,9.76,12

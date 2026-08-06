@@ -1,0 +1,13 @@
+comparison,architecture_x,architecture_y,metric,n_pairs,mean_x,mean_y,mean_difference,median_difference,relative_reduction,ci_lower,ci_upper,n_x_greater,n_x_lower,n_equal,fraction_y_lower,min_difference,max_difference
+"baseline_minus_random","baseline","random_bridging","T_cens_mean",50,7435.7736,7280.1836,155.59,79.22,0.02092452089,-197.1464,524.7656,26,24,0,0.52,-2537.18,3263.26
+"baseline_minus_random","baseline","random_bridging","T_cens_median",50,7048.04,7008.35,39.69,-175,0.00563135283,-282.02,364.83,22,28,0,0.44,-2340,3059
+"baseline_minus_random","baseline","random_bridging","T_cens_p90",50,9925.598,9653.602,271.996,99.85,0.02740348743,-293.522,842,26,24,0,0.52,-3365.9,6004.4
+"baseline_minus_random","baseline","random_bridging","T_cens_p95",50,11016.908,10592.569,424.339,488.375,0.03851706849,-250.758,1109.241,28,22,0,0.56,-5129.35,6820.05
+"random_minus_boundary","random_bridging","boundary_spanning","T_cens_mean",50,7280.1836,4576.0324,2704.1512,2923.17,0.371439973,2467.5628,2932.9056,50,0,0,1,897.14,4897.6
+"random_minus_boundary","random_bridging","boundary_spanning","T_cens_median",50,7008.35,4513.45,2494.9,2654,0.3559896409,2258.56,2717.08,50,0,0,1,668.5,4076
+"random_minus_boundary","random_bridging","boundary_spanning","T_cens_p90",50,9653.602,5444.744,4208.858,4521.4,0.4359883492,3852.26,4566.248,50,0,0,1,1617.2,7805
+"random_minus_boundary","random_bridging","boundary_spanning","T_cens_p95",50,10592.569,5743.537,4849.032,5008.675,0.4577767678,4394.901,5331.826,50,0,0,1,1280.15,11317.9
+"baseline_minus_boundary","baseline","boundary_spanning","T_cens_mean",50,7435.7736,4576.0324,2859.7412,2767.19,0.3845922904,2539.0152,3177.034,50,0,0,1,648.28,5307.06
+"baseline_minus_boundary","baseline","boundary_spanning","T_cens_median",50,7048.04,4513.45,2534.59,2405,0.3596162905,2243.99,2839.81,50,0,0,1,199,5203.5
+"baseline_minus_boundary","baseline","boundary_spanning","T_cens_p90",50,9925.598,5444.744,4480.854,4433.05,0.4514442354,3998.92,4963.968,50,0,0,1,1230.5,8115.4
+"baseline_minus_boundary","baseline","boundary_spanning","T_cens_p95",50,11016.908,5743.537,5273.371,4972.425,0.4786616172,4734.91,5807.258,50,0,0,1,2342.5,9231.45
