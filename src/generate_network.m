@@ -20,6 +20,13 @@ function G = generate_network(P, architecture)
   %     BU         university-side boundary spanners
   %     BI         industry-side boundary spanners
   %     EB         list of cross-boundary edges
+  %
+  % Rerun-v2 boundary-spanning rule:
+  %   Every boundary-spanning cross-boundary tie has exactly one
+  %   boundary-spanner endpoint. The opposite endpoint is always a
+  %   non-boundary-spanner actor. The k cross-boundary ties are split as
+  %   evenly as possible between university-side and industry-side
+  %   responsibility, and workloads are balanced within each side.
 
   validate_architecture(architecture);
 
@@ -44,9 +51,10 @@ function G = generate_network(P, architecture)
   module(university_nodes) = 1;
   module(industry_nodes)   = 2;
 
-  % Boundary spanners are empty unless architecture is boundary_spanning.
+  % Boundary-spanning fields are empty unless architecture is boundary_spanning.
   BU = [];
   BI = [];
+  BS_info = empty_boundary_spanning_info();
 
   % -----------------------------
   % Generate internal ties
@@ -91,7 +99,8 @@ function G = generate_network(P, architecture)
     [A, W, edge_type] = add_random_bridging_edges(P, A, W, edge_type);
 
   elseif strcmp(architecture, 'boundary_spanning')
-    [A, W, edge_type, BU, BI] = add_boundary_spanning_edges(P, A, W, edge_type);
+    [A, W, edge_type, BU, BI, BS_info] = ...
+      add_boundary_spanning_edges(P, A, W, edge_type);
   end
 
   % -----------------------------
@@ -118,6 +127,10 @@ function G = generate_network(P, architecture)
       'Baseline network generated no cross-boundary ties. Regenerate or adjust p_out.');
   end
 
+  if strcmp(architecture, 'boundary_spanning')
+    validate_boundary_spanning_network(P, EB, edge_type, BU, BI, BS_info);
+  end
+
   % -----------------------------
   % Return graph structure
   % -----------------------------
@@ -129,6 +142,15 @@ function G = generate_network(P, architecture)
   G.BI = BI;
   G.EB = EB;
   G.architecture = architecture;
+
+  % Workload diagnostics used by rerun-v2 manifests and analyses.
+  G.BS_info = BS_info;
+  G.BS_load_U = BS_info.load_U;
+  G.BS_load_I = BS_info.load_I;
+  G.BS_workload_mean = BS_info.workload_mean;
+  G.BS_workload_min = BS_info.workload_min;
+  G.BS_workload_max = BS_info.workload_max;
+  G.BS_workload_sd = BS_info.workload_sd;
 end
 
 
@@ -178,8 +200,13 @@ function [A, W, edge_type] = add_random_bridging_edges(P, A, W, edge_type)
 end
 
 
-function [A, W, edge_type, BU, BI] = add_boundary_spanning_edges(P, A, W, edge_type)
-  % Adds exactly k cross-boundary ties involving at least one boundary spanner.
+function [A, W, edge_type, BU, BI, BS_info] = ...
+  add_boundary_spanning_edges(P, A, W, edge_type)
+  % Adds exactly k cross-boundary ties using balanced single-responsibility.
+  %
+  % Each selected cross-boundary tie has exactly one boundary-spanner
+  % endpoint. Responsibility is split as evenly as possible between the
+  % university side and the industry side.
 
   nU = P.nU;
   N  = P.N;
@@ -187,26 +214,71 @@ function [A, W, edge_type, BU, BI] = add_boundary_spanning_edges(P, A, W, edge_t
   university_nodes = 1:nU;
   industry_nodes   = (nU + 1):N;
 
-  % Select boundary spanners.
+  % Select boundary spanners on both sides.
   BU = university_nodes(randperm(P.nU, P.b));
   BI = industry_nodes(randperm(P.nI, P.b));
 
-  % Candidate pairs: u in BU OR i in BI.
-  candidate_pairs = [];
+  non_BU = setdiff(university_nodes, BU);
+  non_BI = setdiff(industry_nodes, BI);
 
-  for u = university_nodes
-    for i = industry_nodes
-      if any(BU == u) || any(BI == i)
-        candidate_pairs = [candidate_pairs; u, i];
+  assert(~isempty(non_BU), ...
+    'Boundary-spanning design requires at least one university non-spanner.');
+
+  assert(~isempty(non_BI), ...
+    'Boundary-spanning design requires at least one industry non-spanner.');
+
+  % Split responsibility between sides.
+  k_U = ceil(P.k / 2);
+  k_I = P.k - k_U;
+
+  assert(k_U <= P.b * length(non_BI), ...
+    'Not enough industry non-spanner partners for university-side responsibility.');
+
+  assert(k_I <= P.b * length(non_BU), ...
+    'Not enough university non-spanner partners for industry-side responsibility.');
+
+  load_U = balanced_load_counts(k_U, P.b);
+  load_I = balanced_load_counts(k_I, P.b);
+
+  selected_pairs = [];
+  responsibility_side = [];
+
+  % University-side responsibility:
+  % university boundary spanner -> industry non-spanner.
+  for s = 1:P.b
+    current_load = load_U(s);
+
+    if current_load > 0
+      partner_idx = randperm(length(non_BI), current_load);
+      partners = non_BI(partner_idx);
+
+      for p = 1:length(partners)
+        selected_pairs = [selected_pairs; BU(s), partners(p)];
+        responsibility_side = [responsibility_side; 1];
       end
     end
   end
 
-  assert(rows(candidate_pairs) >= P.k, ...
-    'Not enough boundary-spanning candidate pairs for k.');
+  % Industry-side responsibility:
+  % university non-spanner -> industry boundary spanner.
+  for s = 1:P.b
+    current_load = load_I(s);
 
-  selected_idx = randperm(rows(candidate_pairs), P.k);
-  selected_pairs = candidate_pairs(selected_idx, :);
+    if current_load > 0
+      partner_idx = randperm(length(non_BU), current_load);
+      partners = non_BU(partner_idx);
+
+      for p = 1:length(partners)
+        selected_pairs = [selected_pairs; partners(p), BI(s)];
+        responsibility_side = [responsibility_side; 2];
+      end
+    end
+  end
+
+  assert(rows(selected_pairs) == P.k, ...
+    'Boundary-spanning selected_pairs must contain exactly k rows.');
+
+  assert_no_duplicate_rows(selected_pairs, 'boundary-spanning selected_pairs');
 
   for r = 1:rows(selected_pairs)
     u = selected_pairs(r, 1);
@@ -220,6 +292,40 @@ function [A, W, edge_type, BU, BI] = add_boundary_spanning_edges(P, A, W, edge_t
 
     edge_type(u, i) = 3;
     edge_type(i, u) = 3;
+  end
+
+  all_load = [load_U; load_I];
+
+  BS_info = empty_boundary_spanning_info();
+  BS_info.responsibility_side = responsibility_side;
+  BS_info.load_U = load_U;
+  BS_info.load_I = load_I;
+  BS_info.n_U_responsibility = sum(responsibility_side == 1);
+  BS_info.n_I_responsibility = sum(responsibility_side == 2);
+  BS_info.workload_mean = mean(all_load);
+  BS_info.workload_min = min(all_load);
+  BS_info.workload_max = max(all_load);
+  BS_info.workload_sd = std(all_load);
+end
+
+
+function counts = balanced_load_counts(total_load, n_spanners)
+  % BALANCED_LOAD_COUNTS
+  % Splits total_load across n_spanners as evenly as possible.
+
+  assert(total_load >= 0 && total_load == floor(total_load), ...
+    'total_load must be a non-negative integer.');
+
+  assert(n_spanners > 0 && n_spanners == floor(n_spanners), ...
+    'n_spanners must be a positive integer.');
+
+  base_load = floor(total_load / n_spanners);
+  remainder = total_load - base_load * n_spanners;
+
+  counts = base_load * ones(n_spanners, 1);
+
+  if remainder > 0
+    counts(1:remainder) = counts(1:remainder) + 1;
   end
 end
 
@@ -253,6 +359,102 @@ function EB = extract_cross_boundary_edges(edge_type, nU, N)
       end
     end
   end
+end
+
+
+function validate_boundary_spanning_network(P, EB, edge_type, BU, BI, BS_info)
+  % VALIDATE_BOUNDARY_SPANNING_NETWORK
+  % Defensive validation of the rerun-v2 BS architecture.
+
+  assert(length(BU) == P.b, ...
+    'Wrong number of university boundary spanners.');
+
+  assert(length(BI) == P.b, ...
+    'Wrong number of industry boundary spanners.');
+
+  assert(rows(EB) == P.k, ...
+    'Boundary-spanning network must have exactly k cross-boundary edges.');
+
+  assert_no_duplicate_rows(EB, 'EB');
+
+  n_U_responsibility = 0;
+  n_I_responsibility = 0;
+
+  for r = 1:rows(EB)
+    u = EB(r, 1);
+    i = EB(r, 2);
+
+    u_is_bs = any(BU == u);
+    i_is_bs = any(BI == i);
+
+    assert(xor(u_is_bs, i_is_bs), ...
+      'Every BS tie must have exactly one boundary-spanner endpoint.');
+
+    assert(edge_type(u, i) == 3, ...
+      'Every BS cross-boundary tie must have edge_type 3.');
+
+    if u_is_bs
+      n_U_responsibility = n_U_responsibility + 1;
+    else
+      n_I_responsibility = n_I_responsibility + 1;
+    end
+  end
+
+  if mod(P.k, 2) == 0
+    assert(n_U_responsibility == P.k / 2, ...
+      'University-side responsibility must be k/2 when k is even.');
+
+    assert(n_I_responsibility == P.k / 2, ...
+      'Industry-side responsibility must be k/2 when k is even.');
+  else
+    assert(abs(n_U_responsibility - n_I_responsibility) <= 1, ...
+      'Side responsibility counts must differ by at most one when k is odd.');
+  end
+
+  assert(sum(BS_info.load_U) == n_U_responsibility, ...
+    'University-side load vector does not match responsibility count.');
+
+  assert(sum(BS_info.load_I) == n_I_responsibility, ...
+    'Industry-side load vector does not match responsibility count.');
+
+  assert(max(BS_info.load_U) - min(BS_info.load_U) <= 1, ...
+    'University-side workload must be balanced.');
+
+  assert(max(BS_info.load_I) - min(BS_info.load_I) <= 1, ...
+    'Industry-side workload must be balanced.');
+end
+
+
+function assert_no_duplicate_rows(X, label)
+  % ASSERT_NO_DUPLICATE_ROWS
+  % Fails if a two-column matrix contains duplicate rows.
+
+  if rows(X) <= 1
+    return;
+  end
+
+  X_sorted = sortrows(X);
+
+  for r = 2:rows(X_sorted)
+    assert(~isequal(X_sorted(r, :), X_sorted(r - 1, :)), ...
+      [label, ' contains duplicate rows.']);
+  end
+end
+
+
+function info = empty_boundary_spanning_info()
+  % EMPTY_BOUNDARY_SPANNING_INFO
+  % Returns a consistently shaped empty BS diagnostics structure.
+
+  info.responsibility_side = [];
+  info.load_U = [];
+  info.load_I = [];
+  info.n_U_responsibility = NaN;
+  info.n_I_responsibility = NaN;
+  info.workload_mean = NaN;
+  info.workload_min = NaN;
+  info.workload_max = NaN;
+  info.workload_sd = NaN;
 end
 
 
