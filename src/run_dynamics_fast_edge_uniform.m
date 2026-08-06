@@ -9,6 +9,13 @@ function out = run_dynamics_fast_edge_uniform(G, P, verbose)
   %
   % This function is used as a robustness benchmark against the
   % agent-first interaction rule.
+  %
+  % Rerun-v2 event-time convention:
+  %   T        = first-passage time if readiness is reached; NaN otherwise.
+  %   T_tilde  = observed time; T if reached, P.T_max if censored.
+  %   delta    = event indicator; 1 if reached, 0 if censored.
+  %
+  % This convention avoids treating P.T_max as an artificial event time.
 
   if nargin < 3
     verbose = false;
@@ -21,8 +28,6 @@ function out = run_dynamics_fast_edge_uniform(G, P, verbose)
   assert(isfield(G, 'W'), 'G must contain weight matrix W.');
   assert(isfield(G, 'edge_type'), 'G must contain edge_type matrix.');
   assert(isfield(G, 'EB'), 'G must contain cross-boundary edge list EB.');
-
-  N = size(G.A, 1);
 
   W = G.W;
 
@@ -55,7 +60,7 @@ function out = run_dynamics_fast_edge_uniform(G, P, verbose)
   RB_history(1) = RB;
 
   converged = 0;
-  T = P.T_max;
+  T = NaN;
 
   if RB >= P.q
     converged = 1;
@@ -138,11 +143,17 @@ function out = run_dynamics_fast_edge_uniform(G, P, verbose)
 
   if converged == 1
     RB_history = RB_history(1:(T + 1));
+    T_tilde = T;
+    delta = 1;
   else
     RB_history = RB_history(1:(P.T_max + 1));
+    T_tilde = P.T_max;
+    delta = 0;
   end
 
   out.T = T;
+  out.T_tilde = T_tilde;
+  out.delta = delta;
   out.converged = converged;
 
   out.final_RB = RB;
