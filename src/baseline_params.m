@@ -99,17 +99,32 @@ function validate_params(P)
   assert(P.k <= max_cross_edges, ...
     'k cannot exceed the number of possible university-industry pairs.');
 
-  % Boundary-spanner checks
+  % Boundary-spanner checks for the rerun-v2 exact-one-spanner design.
   assert(is_positive_integer(P.b), 'b must be a positive integer.');
-  assert(P.b <= P.nU, 'b cannot exceed nU.');
-  assert(P.b <= P.nI, 'b cannot exceed nI.');
 
-  % Candidate boundary-spanning pairs:
-  % pairs where u is in BU or i is in BI.
-  max_BS_candidates = P.b * P.nI + P.nU * P.b - P.b * P.b;
+  assert(P.b < P.nU, ...
+    'b must be smaller than nU so that university non-spanners exist.');
+
+  assert(P.b < P.nI, ...
+    'b must be smaller than nI so that industry non-spanners exist.');
+
+  % Exact-one-spanner candidate pairs:
+  %   university-side spanner with industry non-spanner, or
+  %   university non-spanner with industry-side spanner.
+  max_BS_candidates = P.b * (P.nI - P.b) + P.b * (P.nU - P.b);
 
   assert(P.k <= max_BS_candidates, ...
-    'k is too large for the boundary-spanning candidate set.');
+    'k is too large for the exact-one-spanner boundary-spanning candidate set.');
+
+  % Side-responsibility capacity checks.
+  k_U = ceil(P.k / 2);
+  k_I = P.k - k_U;
+
+  assert(k_U <= P.b * (P.nI - P.b), ...
+    'k_U exceeds university-side boundary-spanner partner capacity.');
+
+  assert(k_I <= P.b * (P.nU - P.b), ...
+    'k_I exceeds industry-side boundary-spanner partner capacity.');
 
   % Relational confidence checks
   assert(is_probability(P.w0),    'w0 must be in [0,1].');
