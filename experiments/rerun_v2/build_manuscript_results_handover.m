@@ -93,6 +93,11 @@ function specs = default_handover_specs()
     'workload_grid_results_handover.md', ...
     'Capacity and workload component of the design principle.');
 
+  specs = append_spec(specs, 'mini_heatmap', ...
+    'Mini heatmap synthesis', ...
+    'mini_heatmap_results_handover.md', ...
+    'Visual synthesis integrating translation capability and boundary-spanner workload.');
+
   specs = append_spec(specs, 'selection_rule', ...
     'Selection-rule robustness', ...
     'selection_rule_results_handover.md', ...
@@ -181,6 +186,7 @@ function write_master_handover(output_file, source_docs, specs, config)
   fprintf(fid, '| Right place | The final core contrasts show that concentrated boundary-spanning positions without translation can be slower than random bridging. | Do not say that appointing boundary spanners is sufficient. Say that position alone can create a bottleneck. |\n');
   fprintf(fid, '| Right people | The final core and translation grid show that higher translation capability reduces readiness delay. | Say translation capability switches boundary spanning from a bottleneck-prone allocation into a delay-reduction mechanism. |\n');
   fprintf(fid, '| Right workload | The workload grid shows that distributing the same cross-boundary tie budget across more boundary spanners reduces RMST and T95, with diminishing marginal gains. | Say role capacity matters; avoid overclaiming the final adjacent T95 contrast if its interval is imprecise. |\n');
+  fprintf(fid, '| Design map synthesis | The mini heatmap jointly displays translation capability and boundary-spanner workload, showing the lowest RMST in the high-translation, low-load region. | Treat this as a reader-facing synthesis of already-tested mechanisms, not as a replacement for the main inferential blocks. |\n');
   fprintf(fid, '| Actor-capacity mechanism | Selection-rule robustness shows that the BS-low bottleneck penalty weakens or disappears under edge-uniform selection, while translation remains beneficial. | Keep agent-first as the baseline and edge-uniform as robustness, not as a replacement model. |\n');
   fprintf(fid, '| Threshold robustness | Threshold robustness shows RMST improvement across all theta/q scenarios and T95 improvement wherever event quantiles are estimable. | For hardest tie-readiness scenario, report high censoring and non-estimable event quantiles rather than artificial event times. |\n');
 
@@ -191,6 +197,7 @@ function write_master_handover(output_file, source_docs, specs, config)
   fprintf(fid, '- Bootstrap intervals are hierarchical and paired over matched graph and trajectory identifiers.\n');
   fprintf(fid, '- `agent_first` remains the baseline selection rule because it represents scarce actor attention and interaction capacity.\n');
   fprintf(fid, '- `edge_uniform` is a robustness condition that removes much of the actor-level overload mechanism.\n');
+  fprintf(fid, '- The mini heatmap is a visual design map; it does not add a new causal identification strategy and should not be described as a replacement for the main final-core, translation-grid, and workload-grid tests.\n');
   fprintf(fid, '- Claims about translation and workload should stay at the level of relational delay risk and readiness, not general project success.\n\n');
 
   fprintf(fid, '## Recommended manuscript placement\n\n');
@@ -200,6 +207,7 @@ function write_master_handover(output_file, source_docs, specs, config)
   fprintf(fid, '| Results: mechanism decomposition | Final core contrasts: RB_low vs BS_low, BS_low vs BS_high, RB_low vs BS_high. | `docs/final_core_results_handover.md`; final-core CSVs. |\n');
   fprintf(fid, '| Results: translation capability | Translation grid over `pi_BS = 0.55, 0.60, 0.65, 0.70`. | `docs/translation_grid_results_handover.md`; translation-grid CSVs. |\n');
   fprintf(fid, '| Results: workload/capacity | Workload grid over `b = 1, 2, 4, 6`. | `docs/workload_grid_results_handover.md`; workload-grid CSVs. |\n');
+  fprintf(fid, '| Results: design-map synthesis | Mini heatmap over `pi_BS = 0.55, 0.60, 0.70` and `b = 1, 2, 6`, using RMST as the cell value. | `docs/mini_heatmap_results_handover.md`; mini-heatmap CSVs; `figures/rerun_v2/mini_heatmap/mini_heatmap_rmst_heatmap.pdf`. |\n');
   fprintf(fid, '| Results or appendix: selection rule | Agent-first vs edge-uniform robustness. | `docs/selection_rule_results_handover.md`; selection-rule CSVs. |\n');
   fprintf(fid, '| Results or appendix: threshold robustness | Alternative theta/q scenarios and hardest-tie censoring caveat. | `docs/threshold_robustness_results_handover.md`; threshold CSVs. |\n\n');
 
@@ -212,6 +220,7 @@ function write_master_handover(output_file, source_docs, specs, config)
   fprintf(fid, '- final core condition and contrast CSVs;\n');
   fprintf(fid, '- translation-grid condition and contrast CSVs;\n');
   fprintf(fid, '- workload-grid condition and contrast CSVs;\n');
+  fprintf(fid, '- mini-heatmap condition and matrix CSVs;\n');
   fprintf(fid, '- selection-rule condition and contrast CSVs;\n');
   fprintf(fid, '- threshold-robustness condition and contrast CSVs.\n\n');
 
@@ -220,16 +229,18 @@ function write_master_handover(output_file, source_docs, specs, config)
   fprintf(fid, '2. Translation capability reverses the bottleneck-prone effect of concentration and reduces relational delay.\n');
   fprintf(fid, '3. Translation effects are monotonic across the tested translation-capability grid.\n');
   fprintf(fid, '4. Even with translation capability fixed, lower per-spanner workload reduces readiness delay.\n');
-  fprintf(fid, '5. The bottleneck penalty depends on actor-level interaction-capacity scarcity, as shown by the edge-uniform robustness condition.\n');
-  fprintf(fid, '6. The translation mechanism is robust across easier and harder readiness thresholds when evaluated with RMST, and upper-tail quantiles support the same direction wherever estimable.\n');
-  fprintf(fid, '7. Under the hardest tie-readiness threshold, low-translation boundary spanning becomes severely delayed and highly censored; event quantiles should be treated as non-estimable rather than forced.\n\n');
+  fprintf(fid, '5. The mini heatmap visually integrates translation and workload by showing the lowest RMST where high translation capability coincides with low per-spanner workload.\n');
+  fprintf(fid, '6. The bottleneck penalty depends on actor-level interaction-capacity scarcity, as shown by the edge-uniform robustness condition.\n');
+  fprintf(fid, '7. The translation mechanism is robust across easier and harder readiness thresholds when evaluated with RMST, and upper-tail quantiles support the same direction wherever estimable.\n');
+  fprintf(fid, '8. Under the hardest tie-readiness threshold, low-translation boundary spanning becomes severely delayed and highly censored; event quantiles should be treated as non-estimable rather than forced.\n\n');
 
   fprintf(fid, '## Claims not supported by the computational design\n\n');
   fprintf(fid, '- Do not claim improved R&D performance.\n');
   fprintf(fid, '- Do not claim improved innovation quality, patents, project completion, or financial value.\n');
   fprintf(fid, '- Do not claim that every T95 contrast is estimable; the hardest tie-readiness scenario is explicitly bounded.\n');
   fprintf(fid, '- Do not treat `T_max` as an event time.\n');
-  fprintf(fid, '- Do not replace the baseline agent-first selection rule with edge-uniform in the main model.\n\n');
+  fprintf(fid, '- Do not replace the baseline agent-first selection rule with edge-uniform in the main model.\n');
+  fprintf(fid, '- Do not treat the mini heatmap as independently bootstrapped causal evidence; use it as a visual synthesis of the translation-grid and workload mechanisms.\n\n');
 
   if config.include_verbatim_sources
     fprintf(fid, '---\n\n');
