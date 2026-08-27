@@ -1,6 +1,6 @@
 function test_manuscript_handover_builder()
   % TEST_MANUSCRIPT_HANDOVER_BUILDER
-  % Tests the Step 27 master handover builder using synthetic source handovers.
+  % Tests the master handover builder using synthetic source handovers.
   % This test does not run simulations.
 
   setup_rerun_v2_tests();
@@ -15,6 +15,7 @@ function test_manuscript_handover_builder()
     'final_core_results_handover.md', 'Final core synthetic values.';
     'translation_grid_results_handover.md', 'Translation-grid synthetic values.';
     'workload_grid_results_handover.md', 'Workload-grid synthetic values.';
+    'mini_heatmap_results_handover.md', 'Mini-heatmap synthetic values.';
     'selection_rule_results_handover.md', 'Selection-rule synthetic values.';
     'threshold_robustness_results_handover.md', 'Threshold-robustness synthetic values.'
   };
@@ -39,15 +40,19 @@ function test_manuscript_handover_builder()
 
   assert(isstruct(exports), 'Builder output must be a structure.');
   assert(exist(exports.output_file, 'file') == 2, 'Master handover output was not created.');
-  assert(exports.n_sources == 5, 'Master handover should include five source handovers.');
+  assert(exports.n_sources == 6, 'Master handover should include six source handovers.');
 
   txt = fileread(exports.output_file);
   assert(~isempty(strfind(txt, 'Manuscript results handover')), ...
     'Output should contain the master handover title.');
   assert(~isempty(strfind(txt, 'Master claim map')), ...
     'Output should contain the master claim map.');
+  assert(~isempty(strfind(txt, 'Design map synthesis')), ...
+    'Output should contain the mini-heatmap design-map synthesis row.');
   assert(~isempty(strfind(txt, 'Final core synthetic values.')), ...
     'Output should append the final-core source text.');
+  assert(~isempty(strfind(txt, 'Mini-heatmap synthetic values.')), ...
+    'Output should append the mini-heatmap source text.');
   assert(~isempty(strfind(txt, 'Threshold-robustness synthetic values.')), ...
     'Output should append the threshold source text.');
 
