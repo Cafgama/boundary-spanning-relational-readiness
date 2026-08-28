@@ -16,9 +16,14 @@ TEST_ROOT = REPO_ROOT / "results" / "processed" / "rerun_v2" / "final_artifact_i
 
 
 def load_module():
-    spec = importlib.util.spec_from_file_location("build_final_artifact_index", SCRIPT_PATH)
+    module_name = "build_final_artifact_index"
+    spec = importlib.util.spec_from_file_location(module_name, SCRIPT_PATH)
     assert spec is not None and spec.loader is not None, "Could not load final artifact index script."
     module = importlib.util.module_from_spec(spec)
+
+    # Python 3.13 dataclasses expect dynamically imported modules to be present
+    # in sys.modules while class decorators are evaluated.
+    sys.modules[module_name] = module
     spec.loader.exec_module(module)
     return module
 
