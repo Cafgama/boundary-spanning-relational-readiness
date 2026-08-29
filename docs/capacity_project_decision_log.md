@@ -26,6 +26,30 @@ The validated boundary-spanning computational track remains frozen and is used a
 9. Treat the legacy model as a richer validation layer for the reduced theory.
 10. Do not call a dynamical crossover a phase transition unless the mathematical/statistical evidence supports that language.
 
+## Model v0.1 — LOCKED
+
+The following decisions are frozen for the first analytical and computational implementation.
+
+1. **Responsibility concentration:** concentration is represented by interface demand/responsibility shares `p_i`. `H` is a descriptive normalized Herfindahl index of `p`, not a primitive causal variable.
+2. **Capacity allocation:** capacity shares are represented independently by `x_i`. Uniform `x_i=1/n` is the core mismatch experiment; proportional matching `x_i=p_i` is the first analytical benchmark.
+3. **Global scarcity:** `Omega = D/C`.
+4. **Local allocation mismatch:** `Lambda = max_i p_i/x_i` over all modules/actors with positive demand.
+5. **Peak offered load:** `chi = Omega Lambda`.
+6. **Relational dynamics:** retain the validated reinforcement/failure law. Do not introduce passive decay during blocked attempts in Model v0.1.
+7. **Competence reduction:** use the mean-field admitted-interaction requirement `s_theta(pi)` and competence gain `G = s_theta(pi_o)/s_theta(pi_s)`. Keep `Delta pi` as a microscopic parameter, not the primary macroscopic coordinate.
+8. **Candidate reduced stress number:** `Xi = Omega Lambda/G`. This is a hypothesis to be tested, not assumed to provide exact data collapse.
+9. **Core endpoint:** full interface readiness (`q=1`) for the minimal theory. `q<1`, including legacy `q=0.8`, belongs to robustness/legacy validation.
+10. **Language:** `Xi≈1` is initially a dynamical switching/crossover boundary, not an equilibrium phase transition.
+
+## Frozen analytical hypotheses
+
+- If `x=p`, then `Lambda=1` exactly and the first-order concentration penalty disappears.
+- For the one-heavy-carrier responsibility family, `H=h^2` exactly.
+- Under uniform capacity for that family, `Lambda = 1 + (n-1)h = 1 + (n-1)sqrt(H)`.
+- Large-window local congestion onset is expected near `chi = Omega Lambda = 1`.
+- Competence-congestion switching is provisionally expected near `Xi = Omega Lambda/G = 1`.
+- Finite demand windows should smooth these large-window boundaries.
+
 ## Current candidate theoretical reduction
 
 Primitive system quantities:
@@ -36,38 +60,24 @@ Primitive system quantities:
 - capacity shares `x_i`;
 - interaction success probability `pi`.
 
-Candidate dimensionless quantities:
+Dimensionless quantities:
 
 - global scarcity: `Omega = D/C`;
 - allocation mismatch: `Lambda = max_i p_i/x_i`;
 - competence gain: `G = s_theta(pi_o)/s_theta(pi_s)`;
 - coordination-stress number: `Xi = Omega Lambda/G`.
 
-Current analytical hypothesis:
+## Next baby step — deterministic analytical layer only
 
-`Xi < 1` -> competence can compensate for congestion.
+Implement pure analytical functions and tests for:
 
-`Xi > 1` -> congestion dominates competence and concentrated interface responsibility becomes bottleneck-prone.
-
-## Open decision gate — Model v0.1
-
-The following recommendations are not yet marked as final locks:
-
-1. Measure concentration primarily in interface responsibility/demand (`p_i`), not directly in capacity shares.
-2. Keep capacity allocation uniform in the core mechanism test; use proportional matching `x_i=p_i` as the first allocation benchmark.
-3. Use `Lambda` as the causal load-amplification variable and retain normalized Herfindahl `H` as a descriptive concentration measure.
-4. Retain the legacy reinforcement/failure relational dynamics for the first reduced model.
-5. Use full interface readiness (`q=1`) as the clean theoretical endpoint and restore `q<1` only in robustness analyses.
-6. Treat `Xi` as a candidate data-collapse variable to be tested, not assumed.
-
-## Next step after lock
-
-Build only the deterministic analytical/test skeleton needed to verify:
-
-- `Omega`, `p`, `x`, `Lambda`, `H`, and `Xi` calculations;
-- capacity conservation;
+- `Omega`, local offered loads, `Lambda`, `chi`, and normalized `H`;
+- capacity/responsibility normalization and domain validation;
 - exact `x=p -> Lambda=1` identity;
-- one-heavy-carrier family and its analytical formulas;
-- legacy-off equivalence scaffolding.
+- one-heavy-carrier family and `H=h^2`;
+- uniform-capacity formula for `Lambda`;
+- `kappa(pi)`, `w_star(pi)`, `pi_c`, `s_theta(pi)`, and `G`;
+- `Xi = chi/G`;
+- legacy numerical sanity check for `G`.
 
-Finite-capacity stochastic dynamics should still remain disabled at that point.
+No stochastic finite-capacity dynamics are permitted in this step.
