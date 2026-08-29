@@ -30,8 +30,6 @@ The validated boundary-spanning computational track remains frozen and is used a
 
 ## Model v0.1 — LOCKED
 
-The following decisions are frozen for the first analytical and computational implementation.
-
 1. **Responsibility concentration:** concentration is represented by interface demand/responsibility shares `p_i`. `H` is a descriptive normalized Herfindahl index of `p`, not a primitive causal variable.
 2. **Capacity allocation:** capacity shares are represented independently by `x_i`. Uniform `x_i=1/n` is the core mismatch experiment; proportional matching `x_i=p_i` is the first analytical benchmark.
 3. **Global scarcity:** `Omega = D/C`.
@@ -43,63 +41,95 @@ The following decisions are frozen for the first analytical and computational im
 9. **Core endpoint:** full interface readiness (`q=1`) for the minimal theory. `q<1`, including legacy `q=0.8`, belongs to robustness/legacy validation.
 10. **Language:** `Xi≈1` is initially a dynamical switching/crossover boundary, not an equilibrium phase transition.
 
-## Model v0.2 admission-layer decisions — LOCKED
+## Model v0.2 admission layer — LOCKED AND TESTED
 
-These decisions govern the first finite-capacity mechanism and add no relational-learning mechanism.
+1. **Joint demand closure:** `P_ij = pA_i * pB_j`, the maximum-entropy product distribution compatible with the prescribed marginals.
+2. **Integer capacity:** target shares `x` are converted to integer actor capacities by the largest-remainder method, preserving total module capacity exactly.
+3. **Realized quantities:** target and realized capacity shares are stored separately. Load/mismatch metrics used for inference are computed from realized integer shares.
+4. **Admission:** an attempted pair `(i,j)` is served iff both endpoints have remaining capacity. Served attempts consume one unit at each endpoint; blocked attempts consume none.
+5. **Clock:** every attempted pair advances the window clock.
+6. **Separation:** deterministic admission and stochastic pair generation are separate functions. No relational-learning state appears in the admission layer.
+7. **RNG:** stochastic demand generation uses an explicit seed and restores the caller RNG state.
 
-1. **Joint demand closure:** given module-level responsibility marginals `pA` and `pB`, the core joint endpoint distribution is the maximum-entropy product distribution
+### Implemented functions
 
-   `P_ij = pA_i * pB_j`.
+- `src/capacity/allocate_integer_capacity.m`
+- `src/capacity/maximum_entropy_pairing.m`
+- `src/capacity/generate_max_entropy_demands.m`
+- `src/capacity/admit_capacity_sequence.m`
+- `src/capacity/run_capacity_window.m`
 
-   Equivalently, the two endpoints are sampled independently from their prescribed marginals. Assortative or fixed-edge pairings are robustness extensions, not core parameters.
+### Test status
 
-2. **Integer capacity:** capacity is an integer count of interactions per window. Target shares `x` are converted to integer capacities with the largest-remainder rule, preserving total capacity exactly.
+GitHub Actions run `33258151078` executed GNU Octave and completed successfully.
 
-3. **Realized quantities:** analyses record target shares and realized integer shares separately. `Omega_realized = D/C_integer`; load/mismatch metrics used for inference are computed from realized capacity shares.
+- Model v0.1 analytical tests: **PASS**
+- Model v0.2 admission tests: **PASS**
 
-4. **Admission logic:** an attempted pair `(i,j)` is served iff both endpoint actors have at least one capacity unit remaining. A served attempt consumes exactly one unit from each endpoint; a blocked attempt consumes none.
+The v0.2 tests verify product-distribution marginals, integer capacity conservation, deterministic tie-breaking, exact blocking semantics, no capacity consumption on blocked attempts, RNG isolation/reproducibility, one-window accounting invariants, and absence of relational-learning variables from the admission layer.
 
-5. **Clock:** every attempt counts toward the `D`-attempt window, whether served or blocked.
+## Fluid-limit result — DERIVED
 
-6. **Separation of concerns:** deterministic admission is implemented as a pure kernel acting on an explicit demand sequence. Random demand generation is a separate wrapper. No `pi`, `alpha`, `beta`, `w`, or readiness variable appears in the admission kernel.
+For symmetric modules under maximum-entropy pairing, let scaled attempt time be `s=t/C` and normalized remaining actor capacity be `z_i(s)`. Define active responsibility mass
 
-7. **RNG discipline:** the stochastic wrapper uses an explicit seed and preserves the caller RNG state. Network/relational RNG streams remain untouched.
+`A(s) = sum_{i:z_i(s)>0} p_i`.
 
-## Frozen analytical hypotheses
+The fluid admission dynamics satisfy
 
-- If `x=p`, then `Lambda=1` exactly in the continuous-share analytical model and the first-order concentration penalty disappears.
-- Integer allocation may introduce a finite-capacity discretization mismatch; therefore `Lambda_realized` must be reported.
-- For the one-heavy-carrier responsibility family, `H=h^2` exactly.
-- Under uniform capacity for that family, `Lambda = 1 + (n-1)h = 1 + (n-1)sqrt(H)`.
-- Large-window local congestion onset is expected near `chi = Omega Lambda = 1`.
-- Competence-congestion switching is provisionally expected near `Xi = Omega Lambda/G = 1`.
-- Finite demand windows should smooth these large-window boundaries.
+`dz_i/ds = -p_i A(s)`
+
+while actor `i` remains active. With cumulative service exposure
+
+`u(s)=integral_0^s A(v)dv`,
+
+we have
+
+`z_i(s)=max[x_i-p_i u(s),0]`.
+
+Before any actor exhausts, `A=1`, so the first exhaustion occurs at
+
+`s_c = min_i x_i/p_i = 1/Lambda`.
+
+Because the window ends at `s=Omega`, deterministic congestion begins exactly when
+
+`Omega Lambda > 1`.
+
+Thus `chi=Omega Lambda` has a direct fluid-limit interpretation:
+
+- `chi<1`: no deterministic capacity blocking in the fluid window;
+- `chi=1`: first capacity exhaustion at the window boundary;
+- `chi>1`: positive deterministic blocking occurs before the window ends.
+
+The full derivation is recorded in `docs/capacity_fluid_limit_v0_2.md`.
+
+### Important sufficiency guardrail
+
+`Lambda` determines the **first-exhaustion/onset boundary** but does not necessarily determine the entire post-onset blocking curve. After the first exhaustion, the full ordered set of local thresholds `{x_i/p_i}` can matter. Therefore `chi` is an exact onset variable in the fluid limit, while complete post-onset data collapse remains an empirical/theoretical question.
 
 ## Current candidate theoretical reduction
 
 Primitive system quantities:
 
-- cross-boundary demand per capacity window `D`;
-- total module capacity `C`;
-- responsibility/demand shares `p_i`;
-- capacity shares `x_i`;
-- interaction success probability `pi`.
+- `D`: cross-boundary demand attempts per capacity window;
+- `C`: total module capacity;
+- `p_i`: responsibility/demand shares;
+- `x_i`: capacity shares;
+- `pi`: interaction competence.
 
 Dimensionless quantities:
 
-- global scarcity: `Omega = D/C`;
-- allocation mismatch: `Lambda = max_i p_i/x_i`;
-- competence gain: `G = s_theta(pi_o)/s_theta(pi_s)`;
-- coordination-stress number: `Xi = Omega Lambda/G`.
+- `Omega = D/C`;
+- `Lambda = max_i p_i/x_i`;
+- `chi = Omega Lambda`;
+- `G = s_theta(pi_o)/s_theta(pi_s)`;
+- candidate coordination-stress number `Xi = chi/G`.
 
-## Current baby step — admission layer only
+## Next baby step
 
-Implement and test:
+Do **not** connect relational learning yet.
 
-- maximum-entropy joint pairing `P = pA pB^T`;
-- largest-remainder integer capacity allocation;
-- deterministic admission for a prescribed sequence of endpoint pairs;
-- stochastic maximum-entropy demand-sequence generation with explicit seed;
-- a one-window wrapper returning served/blocked counts, endpoint use, and remaining capacity.
+First run an admission-only finite-window experiment against the analytical fluid benchmark. The minimum experiment should answer one question:
 
-No relational-learning dynamics are permitted in this step.
+> Does stochastic finite-window blocking converge to the theoretically derived `chi=1` onset as the window scale increases?
+
+Use fixed `(Omega,p,x)` structures and scale `C` and `D` together so that `Omega` and the continuous shares remain fixed. Compare matched allocation `x=p` with one controlled mismatch family. Only after this admission theory is empirically validated should competence and relational learning be connected.
