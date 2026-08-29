@@ -1,4 +1,4 @@
-name: Scarce Capacity Model v0.1 tests
+name: Scarce Capacity Model tests
 
 on:
   push:
@@ -7,11 +7,12 @@ on:
     paths:
       - 'src/capacity/**'
       - 'tests/capacity_v0_1/**'
+      - 'tests/capacity_v0_2/**'
       - '.github/workflows/capacity-v0_1-tests.yml'
   workflow_dispatch:
 
 jobs:
-  octave-analytical-tests:
+  octave-capacity-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -22,6 +23,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y octave
 
-      - name: Run deterministic Model v0.1 tests
+      - name: Run Model v0.1 analytical tests
         run: |
           octave --quiet --eval "cd('tests/capacity_v0_1'); run_capacity_v0_1_tests"
+
+      - name: Run Model v0.2 admission tests
+        run: |
+          octave --quiet --eval "cd('tests/capacity_v0_2'); run_capacity_v0_2_tests"
