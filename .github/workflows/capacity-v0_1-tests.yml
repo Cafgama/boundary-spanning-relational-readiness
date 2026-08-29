@@ -1,0 +1,27 @@
+name: Scarce Capacity Model v0.1 tests
+
+on:
+  push:
+    branches:
+      - paper/scarce-interaction-capacity
+    paths:
+      - 'src/capacity/**'
+      - 'tests/capacity_v0_1/**'
+      - '.github/workflows/capacity-v0_1-tests.yml'
+  workflow_dispatch:
+
+jobs:
+  octave-analytical-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+
+      - name: Run deterministic Model v0.1 tests
+        run: |
+          octave --quiet --eval "cd('tests/capacity_v0_1'); run_capacity_v0_1_tests"
