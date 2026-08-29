@@ -12,6 +12,8 @@ The validated boundary-spanning computational track remains frozen and is used a
 - Legacy source branch: `rerun/balanced-survival-bootstrap`
 - Frozen parent commit: `0e3ad434bb694cba225f4470153d15b53bacaf41`
 - New paper branch: `paper/scarce-interaction-capacity`
+- Frozen Model v0.1 branch: `lock/scarce-capacity-model-v0.1`
+- Frozen Model v0.1 commit: `622154d713e47d4364f2e82b364c5b501a46ceb3`
 
 ## Methodological principles
 
@@ -41,9 +43,32 @@ The following decisions are frozen for the first analytical and computational im
 9. **Core endpoint:** full interface readiness (`q=1`) for the minimal theory. `q<1`, including legacy `q=0.8`, belongs to robustness/legacy validation.
 10. **Language:** `Xi≈1` is initially a dynamical switching/crossover boundary, not an equilibrium phase transition.
 
+## Model v0.2 admission-layer decisions — LOCKED
+
+These decisions govern the first finite-capacity mechanism and add no relational-learning mechanism.
+
+1. **Joint demand closure:** given module-level responsibility marginals `pA` and `pB`, the core joint endpoint distribution is the maximum-entropy product distribution
+
+   `P_ij = pA_i * pB_j`.
+
+   Equivalently, the two endpoints are sampled independently from their prescribed marginals. Assortative or fixed-edge pairings are robustness extensions, not core parameters.
+
+2. **Integer capacity:** capacity is an integer count of interactions per window. Target shares `x` are converted to integer capacities with the largest-remainder rule, preserving total capacity exactly.
+
+3. **Realized quantities:** analyses record target shares and realized integer shares separately. `Omega_realized = D/C_integer`; load/mismatch metrics used for inference are computed from realized capacity shares.
+
+4. **Admission logic:** an attempted pair `(i,j)` is served iff both endpoint actors have at least one capacity unit remaining. A served attempt consumes exactly one unit from each endpoint; a blocked attempt consumes none.
+
+5. **Clock:** every attempt counts toward the `D`-attempt window, whether served or blocked.
+
+6. **Separation of concerns:** deterministic admission is implemented as a pure kernel acting on an explicit demand sequence. Random demand generation is a separate wrapper. No `pi`, `alpha`, `beta`, `w`, or readiness variable appears in the admission kernel.
+
+7. **RNG discipline:** the stochastic wrapper uses an explicit seed and preserves the caller RNG state. Network/relational RNG streams remain untouched.
+
 ## Frozen analytical hypotheses
 
-- If `x=p`, then `Lambda=1` exactly and the first-order concentration penalty disappears.
+- If `x=p`, then `Lambda=1` exactly in the continuous-share analytical model and the first-order concentration penalty disappears.
+- Integer allocation may introduce a finite-capacity discretization mismatch; therefore `Lambda_realized` must be reported.
 - For the one-heavy-carrier responsibility family, `H=h^2` exactly.
 - Under uniform capacity for that family, `Lambda = 1 + (n-1)h = 1 + (n-1)sqrt(H)`.
 - Large-window local congestion onset is expected near `chi = Omega Lambda = 1`.
@@ -67,17 +92,14 @@ Dimensionless quantities:
 - competence gain: `G = s_theta(pi_o)/s_theta(pi_s)`;
 - coordination-stress number: `Xi = Omega Lambda/G`.
 
-## Next baby step — deterministic analytical layer only
+## Current baby step — admission layer only
 
-Implement pure analytical functions and tests for:
+Implement and test:
 
-- `Omega`, local offered loads, `Lambda`, `chi`, and normalized `H`;
-- capacity/responsibility normalization and domain validation;
-- exact `x=p -> Lambda=1` identity;
-- one-heavy-carrier family and `H=h^2`;
-- uniform-capacity formula for `Lambda`;
-- `kappa(pi)`, `w_star(pi)`, `pi_c`, `s_theta(pi)`, and `G`;
-- `Xi = chi/G`;
-- legacy numerical sanity check for `G`.
+- maximum-entropy joint pairing `P = pA pB^T`;
+- largest-remainder integer capacity allocation;
+- deterministic admission for a prescribed sequence of endpoint pairs;
+- stochastic maximum-entropy demand-sequence generation with explicit seed;
+- a one-window wrapper returning served/blocked counts, endpoint use, and remaining capacity.
 
-No stochastic finite-capacity dynamics are permitted in this step.
+No relational-learning dynamics are permitted in this step.
