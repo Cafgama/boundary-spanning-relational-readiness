@@ -1,0 +1,41 @@
+name: E1 admission convergence screening
+
+on:
+  push:
+    branches:
+      - paper/scarce-interaction-capacity
+    paths:
+      - '.github/workflows/e1-admission-screening.yml'
+  workflow_dispatch:
+
+jobs:
+  e1-screening:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+
+      - name: Run E1 screening in Octave
+        run: |
+          mkdir -p results/raw/capacity_v0_3 results/processed/capacity_v0_3
+          octave --quiet --eval "addpath('experiments/capacity_v0_3'); run_admission_convergence_screening('results/raw/capacity_v0_3/e1_admission_convergence_screening.csv', 200);"
+
+      - name: Summarize E1 in Python
+        run: |
+          python3 analysis/capacity_v0_3/summarize_admission_convergence.py \
+            --input results/raw/capacity_v0_3/e1_admission_convergence_screening.csv \
+            --output results/processed/capacity_v0_3/e1_admission_convergence_summary.csv
+
+      - name: Upload E1 screening results
+        uses: actions/upload-artifact@v4
+        with:
+          name: e1-admission-convergence-screening
+          path: |
+            results/raw/capacity_v0_3/e1_admission_convergence_screening.csv
+            results/processed/capacity_v0_3/e1_admission_convergence_summary.csv
+          if-no-files-found: error
