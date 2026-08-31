@@ -4,12 +4,14 @@ on:
   push:
     branches:
       - paper/scarce-interaction-capacity
+      - work/scarce-capacity-competence-v0.5
     paths:
       - 'src/capacity/**'
       - 'tests/capacity_v0_1/**'
       - 'tests/capacity_v0_2/**'
       - 'tests/capacity_v0_3/**'
       - 'tests/capacity_v0_4/**'
+      - 'tests/capacity_v0_5/**'
       - 'experiments/capacity_v0_3/**'
       - 'analysis/capacity_v0_3/**'
       - '.github/workflows/capacity-v0_1-tests.yml'
@@ -42,6 +44,10 @@ jobs:
       - name: Run Model v0.4 transferable actor-learning tests
         run: |
           octave --quiet --eval "cd('tests/capacity_v0_4'); run_capacity_v0_4_tests"
+
+      - name: Run Model v0.5 endpoint competence tests
+        run: |
+          octave --quiet --eval "cd('tests/capacity_v0_5'); run_capacity_v0_5_tests"
 
       - name: Smoke-test E1 raw-data generation
         run: |
