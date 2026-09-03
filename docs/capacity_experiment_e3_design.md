@@ -44,104 +44,83 @@ Set
 
 `h = k/15`, for `k = 0,1,...,15`.
 
-This gives 16 concentration levels from diffuse (`h=0`) to complete concentration (`h=1`).
+This gives 16 concentration levels from diffuse (`h=0`) to complete concentration (`h=1`). For this family `H=h^2`.
 
-For this family
+## 4. Capacity scale and integer-compatible h grid
 
-`H = h^2`.
-
-## 4. Capacity scale and why the h grid is integer-compatible
-
-Fix
-
-`C = 60`
-
-capacity units per module per window.
+Fix `C=60` capacity units per module per window.
 
 The chosen `h=k/15` grid makes the matched allocation exactly integer-compatible:
 
-- heavy-carrier capacity under `x=p` is `c_1 = 15+3k`;
-- each ordinary-carrier capacity is `c_o = 15-k`.
+- heavy-carrier capacity under `x=p` is `c_1=15+3k`;
+- each ordinary-carrier capacity is `c_o=15-k`.
 
-These sum exactly to 60 for every `k`.
+These sum exactly to 60 for every `k`. Therefore the matched arm has exactly `x_realized=p` and `Lambda=1` with no largest-remainder artifact.
 
-Therefore the matched arm has exactly
-
-`x_realized = p`
-
-and
-
-`Lambda = 1`
-
-with no largest-remainder artifact.
-
-The uniform-capacity arm is also exact:
-
-`x_i = 1/4`, hence `c_i = 15` for all four actors.
-
-For the uniform arm,
-
-`Lambda = 1+3h`.
+The uniform-capacity arm is also exact: `x_i=1/4`, hence `c_i=15` for all four actors. For the uniform arm, `Lambda=1+3h`.
 
 This integer-compatible design is intentional: E3 should test learning versus mismatch, not integer discretization.
 
 ## 5. Capacity policies
 
-For every responsibility architecture compare two policies using the same demand realization:
+For every responsibility architecture compare two policies using the same demand realization.
 
 ### M — matched capacity
 
-`x = p`.
+`x=p`.
 
 Purpose: preserve responsibility concentration and its learning-focus benefit while removing deterministic allocation mismatch.
 
 ### U — uniform capacity
 
-`x_i = 1/4`.
+`x_i=1/4`.
 
 Purpose: hold total capacity fixed while creating responsibility-capacity mismatch as concentration rises.
 
-The causal contrast `U - M` isolates the cost of failing to move capacity with responsibility.
+The causal contrast `U-M` isolates the cost of failing to move capacity with responsibility.
 
 ## 6. Scarcity grid
 
 Use
 
-`Omega in {0.4, 0.6, 0.8, 1.0, 1.2, 1.5, 2.0}`.
+`Omega in {0.4,0.6,0.8,1.0,1.2,1.5,2.0}`.
 
 Since `C=60`, all demand counts are integer:
 
 `D in {24,36,48,60,72,90,120}`.
 
-Capacity resets every `D` attempted interactions.
-
-Use `max_windows = 10` for screening. The corresponding attempt horizon is `T_max = 10D`.
+Capacity resets every `D` attempted interactions. Use `max_windows=10` for screening, so `T_max=10D`.
 
 ## 7. Pre-data analytical diagnostics
 
-For each `h`, compute the no-capacity first-moment readiness crossing `t0(h)` from
+For each `h`, compute both:
+
+- `t0_real(h)`: the real-valued root of the exact first-moment law;
+- `t0_integer(h)`: the first integer attempt at which the exact first moment reaches `Theta`.
+
+The exact no-capacity first moment is
 
 `E[W(t)] = 1-(1-w0) sum_i p_i (1-alpha p_i)^t`.
 
-For each capacity policy compute
+Use `t0_real` in the timescale diagnostic
+
+`Psi = Lambda t0_real / C`.
+
+Also compute
 
 `Lambda = max_i p_i/x_i`,
 
-`chi = Omega Lambda`,
-
-and
-
-`Psi = Lambda t0 / C`.
+`chi = Omega Lambda`.
 
 Interpretations:
 
 - `chi>1`: deterministic first exhaustion occurs before the capacity window ends;
-- `Psi>1`: deterministic first exhaustion occurs before the no-capacity readiness benchmark;
+- `Psi>1`: deterministic first exhaustion occurs before the no-capacity mean-readiness timescale;
 - the candidate deterministic congestion-relevance region is `chi>1 AND Psi>1`.
 
 These are onset diagnostics, not assumed universal delay laws.
 
-## 8. Paired no-capacity counterfactual
+## 8. Paired no-capacity counterfactual and monotonicity invariant
 
 For every stochastic replication and responsibility vector, compute a no-capacity trajectory using the **same demand seed** as the capacity-constrained trajectory.
 
@@ -155,13 +134,19 @@ when both first passages are observed.
 
 This common-random-number comparison isolates delay caused by capacity blocking.
 
+A stronger pathwise invariant follows. The capacity-constrained trajectory can only suppress learning events that are present in the no-capacity trajectory. Therefore for every actor and every attempted time,
+
+`N_i^capacity(t) <= N_i^free(t)`, hence `w_i^capacity(t) <= w_i^free(t)` and `W_g^capacity(t) <= W_g^free(t)`.
+
+Consequently, whenever both first passages are observed,
+
+`DeltaT >= 0`.
+
+The screening code must assert this pathwise. Any negative paired delay is an implementation error, not a scientific result.
+
 ## 9. Screening replication count
 
-Use
-
-`R = 200`
-
-replications per cell.
+Use `R=200` replications per cell.
 
 Total coupled cells:
 
@@ -181,13 +166,7 @@ When `x=p`, concentration should retain the E2 learning-focus effect while deter
 
 ### E3-H2 — Two-gate congestion relevance
 
-The largest systematic positive delays in the uniform-capacity arm should occur where both
-
-`chi>1`
-
-and
-
-`Psi>1`.
+The largest systematic positive delays in the uniform-capacity arm should occur where both `chi>1` and `Psi>1`.
 
 Finite-window fluctuations may blur these boundaries, especially near one, so the prediction is qualitative/onset-based rather than a strict zero-delay theorem.
 
@@ -207,11 +186,15 @@ At `h=1`, all demand falls on actor 1. Under uniform capacity with `C=60`, actor
 
 For the E3 Omega grid, every window contains at least 24 attempts, so the capacity-constrained and no-capacity trajectories should both reach readiness at attempt 14 before the 15-slot carrier capacity is exhausted.
 
-Therefore
+Therefore `DeltaT(h=1)=0` is an exact endpoint prediction for both capacity policies across the full E3 Omega grid.
 
-`DeltaT(h=1) = 0`
+### E3-H5 — Pathwise nonnegative delay
 
-is an exact endpoint prediction for both capacity policies across the full E3 Omega grid.
+For every paired realization in which both first passages are observed,
+
+`DeltaT >= 0`.
+
+This is an exact monotonicity invariant implied by suppression-only capacity blocking.
 
 ## 11. Raw outputs
 
@@ -221,8 +204,8 @@ Store at minimum:
 - `h`, `H`;
 - `replication`, `demand_seed`;
 - `C`, `D`, `Omega`;
-- target and realized `Lambda`, `chi`;
-- analytical `t0_mean_cross`, `Psi`;
+- realized `Lambda`, `chi`;
+- analytical `t0_real`, `t0_integer`, `Psi`;
 - `T_capacity`, `T_capacity_tilde`, `delta_capacity`;
 - `T_free`, `T_free_tilde`, `delta_free`;
 - paired `DeltaT` when estimable;
@@ -237,7 +220,7 @@ For each `(policy,h,Omega)` report:
 
 - event fraction;
 - mean and median observed first passage if uncensored;
-- RMST-style mean of `T_tilde` if any censoring occurs;
+- mean `T_capacity_tilde` as the finite-horizon RMST estimator if censoring occurs;
 - mean paired `DeltaT` over estimable pairs;
 - median and 90th/95th percentiles of `DeltaT`;
 - mean blocked fraction;
@@ -254,6 +237,7 @@ E3 is considered mechanistically successful if:
 1. the matched arm preserves the E2 concentration advantage with comparatively small capacity delay;
 2. the uniform arm develops systematic delay in the predicted `chi/Psi` relevance region;
 3. the concentration profile shows evidence consistent with the predicted intermediate-concentration penalty rather than a simple monotone increase;
-4. the exact `h=1` zero-delay endpoint is reproduced.
+4. the exact `h=1` zero-delay endpoint is reproduced;
+5. the pathwise nonnegative-delay invariant holds for every estimable pair.
 
 Only after these checks pass should specialist competence (`ell_s>ell_o`) be introduced in E4.
