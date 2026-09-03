@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - paper/scarce-interaction-capacity
+      - work/scarce-capacity-coupled-v0.7
     paths:
       - 'src/capacity/**'
       - 'tests/capacity_v0_1/**'
@@ -12,6 +13,7 @@ on:
       - 'tests/capacity_v0_4/**'
       - 'tests/capacity_v0_5/**'
       - 'tests/capacity_v0_6/**'
+      - 'tests/capacity_v0_7/**'
       - 'experiments/capacity_v0_3/**'
       - 'experiments/capacity_v0_6/**'
       - 'analysis/capacity_v0_3/**'
@@ -54,6 +56,10 @@ jobs:
       - name: Run Model v0.6 continuous-readiness tests
         run: |
           octave --quiet --eval "cd('tests/capacity_v0_6'); run_capacity_v0_6_tests"
+
+      - name: Run Model v0.7 coupled capacity-learning tests
+        run: |
+          octave --quiet --eval "cd('tests/capacity_v0_7'); run_capacity_v0_7_tests"
 
       - name: Smoke-test E1 raw-data generation
         run: |
