@@ -1,0 +1,63 @@
+name: E5 competence pre-data gate
+
+on:
+  push:
+    branches:
+      - work/e5-competence-switching
+    paths:
+      - 'src/capacity/competence_switching_threshold.m'
+      - 'tests/capacity_v0_9/**'
+      - 'experiments/capacity_v0_9/**'
+      - 'docs/capacity_experiment_e5_design.md'
+      - '.github/workflows/e5-competence-predata-smoke.yml'
+  workflow_dispatch:
+
+jobs:
+  e5-predata:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+
+      - name: Run v0.9 competence threshold tests
+        run: |
+          octave --quiet --eval "cd('tests/capacity_v0_9'); run_capacity_v0_9_tests"
+
+      - name: Generate full E5 deterministic competence map
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_9'); run_e5_predata_competence_map('/tmp/e5_predata_map.csv');"
+          test $(( $(wc -l < /tmp/e5_predata_map.csv) - 1 )) -eq 90
+
+      - name: Audit E5 map regimes and monotonicity
+        run: |
+          python3 - <<'PY'
+          import csv, math
+          with open('/tmp/e5_predata_map.csv', newline='') as f:
+              rows=list(csv.DictReader(f))
+          assert len(rows)==90
+          assert {r['regime'] for r in rows} <= {'structural_win','competence_rescuable','unrescuable'}
+          assert {'structural_win','competence_rescuable','unrescuable'} <= {r['regime'] for r in rows}
+          for r in rows:
+              ts=[float(r[f'T_ell_{x}']) for x in ('070','080','090','100')]
+              assert all(ts[i+1] <= ts[i] + 1e-10 for i in range(3)), r
+              reg=r['regime']
+              star=float(r['ell_star'])
+              if reg=='structural_win':
+                  assert abs(star-0.70) < 1e-10, r
+              elif reg=='competence_rescuable':
+                  assert 0.70 < star <= 1.0, r
+              else:
+                  assert math.isnan(star), r
+          print('PASS: E5 deterministic map contains all three regimes and is competence-monotone')
+          PY
+
+      - name: Upload pre-data map
+        uses: actions/upload-artifact@v4
+        with:
+          name: e5-predata-competence-map
+          path: /tmp/e5_predata_map.csv
