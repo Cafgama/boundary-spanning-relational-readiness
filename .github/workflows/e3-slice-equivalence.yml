@@ -1,0 +1,45 @@
+name: E3 Slice Equivalence
+
+on:
+  push:
+    branches:
+      - work/e3-parallel-execution
+    paths:
+      - 'experiments/capacity_v0_7/run_learning_congestion_screening.m'
+      - '.github/workflows/e3-slice-equivalence.yml'
+  workflow_dispatch:
+
+jobs:
+  slice-equivalence:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+
+      - name: Generate monolithic and sliced R=1 outputs
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_7'); run_learning_congestion_screening('/tmp/e3_full.csv',1); run_learning_congestion_screening('/tmp/e3_k0.csv',1,0); run_learning_congestion_screening('/tmp/e3_k5.csv',1,5); run_learning_congestion_screening('/tmp/e3_k15.csv',1,15);"
+          test $(( $(wc -l < /tmp/e3_full.csv) - 1 )) -eq 224
+          test $(( $(wc -l < /tmp/e3_k0.csv) - 1 )) -eq 14
+          test $(( $(wc -l < /tmp/e3_k5.csv) - 1 )) -eq 14
+          test $(( $(wc -l < /tmp/e3_k15.csv) - 1 )) -eq 14
+
+      - name: Prove slices are row-identical to monolithic subsets
+        run: |
+          python3 - <<'PY'
+          import csv
+          def read(path):
+              with open(path, newline='') as f:
+                  return list(csv.DictReader(f))
+          full = read('/tmp/e3_full.csv')
+          for k in (0,5,15):
+              sliced = read(f'/tmp/e3_k{k}.csv')
+              expected = [r for r in full if int(r['k']) == k]
+              assert sliced == expected, f'k={k} slice differs from monolithic subset'
+          print('PASS: E3 slices are row-identical to monolithic output')
+          PY
