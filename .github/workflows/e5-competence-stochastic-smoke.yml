@@ -1,0 +1,68 @@
+name: E5 competence stochastic smoke
+
+on:
+  push:
+    branches:
+      - work/e5-competence-switching
+    paths:
+      - 'experiments/capacity_v0_9/run_e5_competence_switching_screening.m'
+      - 'analysis/capacity_v0_9/**'
+      - 'docs/capacity_experiment_e5_execution_lock.md'
+      - '.github/workflows/e5-competence-stochastic-smoke.yml'
+  workflow_dispatch:
+
+jobs:
+  e5-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+
+      - name: Run deterministic v0.9 tests
+        run: |
+          octave --quiet --eval "cd('tests/capacity_v0_9'); run_capacity_v0_9_tests"
+
+      - name: Verify homogeneous no-premium identity
+        run: |
+          octave --quiet --eval "addpath('src/capacity'); p=one_heavy_responsibility(4,8/15); x=ones(1,4)/4; a=simulate_capacity_learning_readiness(p,p,x,x,.4,.08,.7,.7,.8,60,60,20,538020001,638020001); e=.7*ones(1,4); b=simulate_capacity_learning_readiness(p,p,x,x,.4,.08,e,e,.8,60,60,20,538020001,638020001); assert(isequaln(a.T,b.T)); assert(a.T_tilde==b.T_tilde); assert(a.n_blocked==b.n_blocked); assert(a.n_productive_A==b.n_productive_A); assert(a.n_productive_B==b.n_productive_B); disp('PASS: E5 no-premium scalar/vector identity');"
+
+      - name: Generate E5 stochastic smoke
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_9'); run_e5_competence_switching_screening('/tmp/e5_smoke.csv',1);"
+          test $(( $(wc -l < /tmp/e5_smoke.csv) - 1 )) -eq 192
+
+      - name: Summarize E5 stochastic smoke
+        run: |
+          python3 analysis/capacity_v0_9/summarize_e5_competence_switching.py \
+            --input /tmp/e5_smoke.csv \
+            --output /tmp/e5_summary.csv
+          test $(( $(wc -l < /tmp/e5_summary.csv) - 1 )) -eq 192
+
+      - name: Audit raw E5 invariants
+        run: |
+          python3 - <<'PY'
+          import csv, math
+          from collections import defaultdict
+          with open('/tmp/e5_smoke.csv',newline='') as f:
+              rows=list(csv.DictReader(f))
+          assert len(rows)==192
+          for r in rows:
+              assert float(r['capacity_penalty_tilde']) >= -1e-12, r
+          ladders=defaultdict(list)
+          for r in rows:
+              key=(r['policy'],r['Omega'],r['k'],r['replication'])
+              ladders[key].append((float(r['ell_s']),float(r['T_capacity_tilde']),float(r['T_free_tilde'])))
+          assert len(ladders)==48
+          for key,v in ladders.items():
+              v=sorted(v)
+              assert [x[0] for x in v]==[0.7,0.8,0.9,1.0]
+              for i in range(3):
+                  assert v[i+1][1] <= v[i][1] + 1e-12, (key,v)
+                  assert v[i+1][2] <= v[i][2] + 1e-12, (key,v)
+          print('PASS: E5 raw pathwise competence and capacity invariants')
+          PY
