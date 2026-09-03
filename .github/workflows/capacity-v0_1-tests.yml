@@ -11,8 +11,11 @@ on:
       - 'tests/capacity_v0_3/**'
       - 'tests/capacity_v0_4/**'
       - 'tests/capacity_v0_5/**'
+      - 'tests/capacity_v0_6/**'
       - 'experiments/capacity_v0_3/**'
+      - 'experiments/capacity_v0_6/**'
       - 'analysis/capacity_v0_3/**'
+      - 'analysis/capacity_v0_6/**'
       - '.github/workflows/capacity-v0_1-tests.yml'
   workflow_dispatch:
 
@@ -47,6 +50,10 @@ jobs:
       - name: Run Model v0.5 endpoint competence tests
         run: |
           octave --quiet --eval "cd('tests/capacity_v0_5'); run_capacity_v0_5_tests"
+
+      - name: Run Model v0.6 continuous-readiness tests
+        run: |
+          octave --quiet --eval "cd('tests/capacity_v0_6'); run_capacity_v0_6_tests"
 
       - name: Smoke-test E1 raw-data generation
         run: |
