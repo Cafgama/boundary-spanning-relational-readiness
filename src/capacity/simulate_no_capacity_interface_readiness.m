@@ -6,8 +6,13 @@ function out = simulate_no_capacity_interface_readiness(pA, pB, w0, alpha, ellA,
 % maximum-entropy product closure. Each endpoint independently converts the
 % encounter into productive transferable learning using ellA/ellB.
 %
-% First passage:
-%   T = inf{t : min(WA(t),WB(t)) >= Theta}.
+% Module crossings:
+%   T_A = inf{t : W_A(t) >= Theta}
+%   T_B = inf{t : W_B(t) >= Theta}
+%
+% System first passage:
+%   T = inf{t : min(WA(t),WB(t)) >= Theta} = max(T_A,T_B)
+% when both module crossings are observed.
 %
 % T is NaN if censored at T_max; T_tilde=T_max and delta=0 in that case.
 
@@ -35,12 +40,20 @@ function out = simulate_no_capacity_interface_readiness(pA, pB, w0, alpha, ellA,
   out.T = NaN;
   out.T_tilde = T_max;
   out.delta = 0;
+  out.TA = NaN;
+  out.TB = NaN;
   out.WA = R0.WA;
   out.WB = R0.WB;
   out.Wmin = R0.Wmin;
   out.n_productive_A = 0;
   out.n_productive_B = 0;
 
+  if R0.WA >= Theta
+    out.TA = 0;
+  end
+  if R0.WB >= Theta
+    out.TB = 0;
+  end
   if R0.Wmin >= Theta
     out.T = 0;
     out.T_tilde = 0;
@@ -74,6 +87,14 @@ function out = simulate_no_capacity_interface_readiness(pA, pB, w0, alpha, ellA,
     end
 
     R = continuous_interface_readiness(wA, pA, wB, pB);
+
+    if isnan(out.TA) && R.WA >= Theta
+      out.TA = t;
+    end
+    if isnan(out.TB) && R.WB >= Theta
+      out.TB = t;
+    end
+
     if R.Wmin >= Theta
       out.T = t;
       out.T_tilde = t;
