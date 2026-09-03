@@ -1,9 +1,14 @@
-function run_learning_congestion_screening(output_path, R)
+function run_learning_congestion_screening(output_path, R, k_grid)
 % RUN_LEARNING_CONGESTION_SCREENING
 % E3: responsibility-learning focus x finite capacity congestion.
 %
 % Usage:
 %   run_learning_congestion_screening('results/raw/e3_learning_congestion.csv', 200)
+%   run_learning_congestion_screening('results/raw/e3_k5.csv', 200, 5)
+%
+% Optional k_grid selects a subset of the locked h=k/15 grid for parallel
+% execution. Seeds depend on the absolute k value, not loop position, so a
+% sliced run is row-identical to the corresponding subset of a monolithic run.
 %
 % PRE-DATA design is documented in docs/capacity_experiment_e3_design.md.
 
@@ -13,7 +18,14 @@ function run_learning_congestion_screening(output_path, R)
   if nargin < 2 || isempty(R)
     R = 200;
   end
+  if nargin < 3 || isempty(k_grid)
+    k_grid = 0:15;
+  end
   assert(isscalar(R) && R >= 1 && R == floor(R), 'R must be a positive integer.');
+  assert(isvector(k_grid) && ~isempty(k_grid) && all(isfinite(k_grid(:))) && ...
+    all(k_grid(:) == floor(k_grid(:))) && all(k_grid(:) >= 0) && all(k_grid(:) <= 15), ...
+    'k_grid must contain integers in [0,15].');
+  k_grid = k_grid(:)';
 
   this_dir = fileparts(mfilename('fullpath'));
   repo_root = fileparts(fileparts(this_dir));
@@ -26,7 +38,6 @@ function run_learning_congestion_screening(output_path, R)
   Theta = 0.8;
   C = 60;
   max_windows = 10;
-  k_grid = 0:15;
   omega_grid = [0.4,0.6,0.8,1.0,1.2,1.5,2.0];
   x_uniform = ones(1,n)/n;
 
@@ -64,7 +75,8 @@ function run_learning_congestion_screening(output_path, R)
       T_max = D*max_windows;
 
       for rep = 1:R
-        demand_seed = 430000000 + ik*1000000 + io*10000 + rep;
+        % Absolute k keeps seeds invariant under slicing.
+        demand_seed = 430000000 + (k+1)*1000000 + io*10000 + rep;
 
         free = simulate_no_capacity_interface_readiness_fast_ell1( ...
           p,p,w0,alpha,Theta,T_max,demand_seed);
@@ -97,7 +109,6 @@ function run_learning_congestion_screening(output_path, R)
 
           any_block = double(cap.n_blocked > 0);
 
-          % Exactly 36 format specifiers for the 36 declared CSV columns.
           fprintf(fid, ['%s,%d,%d,%d,%d,%.15g,%.15g,%.15g,%.15g,%.15g,%.15g,' ...
             '%d,%d,%.15g,%d,%d,%.15g,%.15g,%.15g,%d,%.15g,%.15g,%d,%d,' ...
             '%.15g,%d,%d,%.15g,%d,%d,%d,%.15g,%d,%.15g,%d,%.15g\n'], ...
