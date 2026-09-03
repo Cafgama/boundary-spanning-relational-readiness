@@ -12,7 +12,7 @@ Theta = 0.8;
 p = [0.4, 0.3, 0.2, 0.1];
 x = ones(1,4)/4;
 D = 200;
-C = 4 * D;  % each actor has D slots; no actor can exhaust within D attempts
+C = 4 * D;
 ell = 0.6;
 demand_seed = 1201;
 learning_seed = 2201;
@@ -52,9 +52,6 @@ if adm.n_blocked > 0
 end
 
 %% 3. Capacity resets each window while transferable memory persists.
-% All demand goes to actor 1; actor 1 has exactly five slots per window.
-% With ell=1, 14 productive encounters are required, so readiness must occur
-% at global attempt 14 in the third window.
 p3 = [1, 0, 0, 0];
 x3 = [1, 0, 0, 0];
 reset_case = simulate_capacity_learning_readiness(p3, p3, x3, x3, w0, alpha, 1, 1, ...
@@ -67,7 +64,6 @@ assert(reset_case.n_blocked == 0 && reset_case.n_served == 14, ...
   'Matched single-carrier toy case should serve all attempts up to readiness.');
 
 %% 4. Blocked attempts never produce learning.
-% Actor 1 receives all demand but only one of five capacity units each window.
 x4 = [0.2, 0.8, 0, 0];
 blocked_case = simulate_capacity_learning_readiness(p3, p3, x4, x4, w0, alpha, 1, 1, ...
   Theta, 5, 3, 2, 7701, 8701);
@@ -83,14 +79,11 @@ assert(abs(blocked_case.WA-expected_w2) < tol && abs(blocked_case.WB-expected_w2
   'Terminal readiness should reflect exactly two productive learning events.');
 
 %% 5. Capacity resets are operational, not memory resets.
-% If memory were incorrectly reset, terminal W would equal one update, not two.
 expected_w1 = 1 - (1-w0)*(1-alpha);
 assert(blocked_case.WA > expected_w1 + tol, ...
   'Transferable memory appears to have reset across capacity windows.');
 
 %% 6. Realized load metrics use integer-realized capacity shares, not targets.
-% C2=30 and target x=(1/4,... ) realizes c=(8,8,7,7), so the heavy
-% carrier has x_realized=8/30 and Lambda=0.5/(8/30)=1.875 rather than 2.
 assert(abs(cpl.Omega_realized - adm.Omega_realized) < tol, ...
   'Coupled and admission-only realized Omega must agree.');
 assert(abs(cpl.Lambda_realized - adm.Lambda_realized) < tol, ...
@@ -118,4 +111,51 @@ state_after = rng();
 assert(isequal(state_before, state_after), ...
   'Coupled simulator must preserve caller RNG state.');
 
+%% 9. Fast ell=1 path exactly reproduces generic matched-capacity dynamics.
+p9 = one_heavy_responsibility(4, 6/15);
+x9 = p9;
+g9 = simulate_capacity_learning_readiness(p9,p9,x9,x9,w0,alpha,1,1,Theta,60,72,5,13101,14101);
+f9 = simulate_capacity_learning_readiness_fast_ell1(p9,p9,x9,x9,w0,alpha,Theta,60,72,5,13101);
+assert_same_ell1_path(g9,f9,tol,'matched');
+
+%% 10. Fast ell=1 path exactly reproduces generic uniform-mismatch dynamics.
+p10 = one_heavy_responsibility(4, 8/15);
+x10 = ones(1,4)/4;
+g10 = simulate_capacity_learning_readiness(p10,p10,x10,x10,w0,alpha,1,1,Theta,60,90,5,15101,16101);
+f10 = simulate_capacity_learning_readiness_fast_ell1(p10,p10,x10,x10,w0,alpha,Theta,60,90,5,15101);
+assert_same_ell1_path(g10,f10,tol,'uniform mismatch');
+
+%% 11. Fast path reproduces a censored mult-window mismatch trajectory.
+p11 = one_heavy_responsibility(4, 4/15);
+x11 = ones(1,4)/4;
+g11 = simulate_capacity_learning_readiness(p11,p11,x11,x11,w0,alpha,1,1,0.99,60,24,2,17101,18101);
+f11 = simulate_capacity_learning_readiness_fast_ell1(p11,p11,x11,x11,w0,alpha,0.99,60,24,2,17101);
+assert_same_ell1_path(g11,f11,tol,'censored mult-window');
+
+%% 12. Exact complete-concentration endpoint is identical and reaches T=14.
+p12 = one_heavy_responsibility(4,1);
+x12 = ones(1,4)/4;
+g12 = simulate_capacity_learning_readiness(p12,p12,x12,x12,w0,alpha,1,1,Theta,60,120,2,19101,20101);
+f12 = simulate_capacity_learning_readiness_fast_ell1(p12,p12,x12,x12,w0,alpha,Theta,60,120,2,19101);
+assert_same_ell1_path(g12,f12,tol,'complete concentration');
+assert(g12.T == 14 && g12.n_blocked == 0, ...
+  'At h=1, readiness must occur at attempt 14 before the 15-slot carrier exhausts.');
+
 fprintf('PASS: coupled capacity-learning tests.\n');
+
+function assert_same_ell1_path(g,f,tol,label)
+  assert(isequaln(g.T,f.T) && g.delta == f.delta, ...
+    'Fast/generic T mismatch in %s case.', label);
+  assert(g.T_tilde == f.T_tilde && g.n_attempted == f.n_attempted, ...
+    'Fast/generic stopping bookkeeping mismatch in %s case.', label);
+  assert(g.n_served == f.n_served && g.n_blocked == f.n_blocked, ...
+    'Fast/generic admission mismatch in %s case.', label);
+  assert(isequaln(g.first_block_attempt,f.first_block_attempt), ...
+    'Fast/generic first-block mismatch in %s case.', label);
+  assert(g.n_windows_started == f.n_windows_started, ...
+    'Fast/generic window-count mismatch in %s case.', label);
+  assert(g.n_productive_A == f.n_productive_A && g.n_productive_B == f.n_productive_B, ...
+    'Fast/generic productive-count mismatch in %s case.', label);
+  assert(abs(g.WA-f.WA) < tol && abs(g.WB-f.WB) < tol && abs(g.Wmin-f.Wmin) < tol, ...
+    'Fast/generic readiness mismatch in %s case.', label);
+end
