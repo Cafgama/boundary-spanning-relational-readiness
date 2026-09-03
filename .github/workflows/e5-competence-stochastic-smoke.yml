@@ -36,6 +36,21 @@ jobs:
           octave --quiet --eval "addpath('experiments/capacity_v0_9'); run_e5_competence_switching_screening('/tmp/e5_smoke.csv',1);"
           test $(( $(wc -l < /tmp/e5_smoke.csv) - 1 )) -eq 192
 
+      - name: Verify execution slice equals full-run subset
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_9'); run_e5_competence_switching_screening('/tmp/e5_k8.csv',1,8);"
+          test $(( $(wc -l < /tmp/e5_k8.csv) - 1 )) -eq 24
+          python3 - <<'PY'
+          import csv
+          with open('/tmp/e5_smoke.csv',newline='') as f:
+              full=[r for r in csv.DictReader(f) if int(r['k'])==8]
+          with open('/tmp/e5_k8.csv',newline='') as f:
+              sliced=list(csv.DictReader(f))
+          assert len(full)==len(sliced)==24
+          assert full==sliced
+          print('PASS: E5 k=8 slice is row-identical to full-run subset')
+          PY
+
       - name: Summarize E5 stochastic smoke
         run: |
           python3 analysis/capacity_v0_9/summarize_e5_competence_switching.py \
