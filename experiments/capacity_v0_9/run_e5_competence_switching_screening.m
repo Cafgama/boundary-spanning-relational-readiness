@@ -1,10 +1,13 @@
-function run_e5_competence_switching_screening(output_path, R)
+function run_e5_competence_switching_screening(output_path, R, k_subset)
 % RUN_E5_COMPETENCE_SWITCHING_SCREENING
 % E5: heterogeneous specialist competence under scarce interface capacity.
 %
 % PRE-DATA design:
 %   docs/capacity_experiment_e5_design.md
 %   docs/capacity_experiment_e5_execution_lock.md
+%
+% Optional k_subset is an execution-only slice. It must be a subset of the
+% frozen E5 concentration grid and does not alter seeds or cell definitions.
 
   if nargin < 1 || isempty(output_path)
     output_path = 'results/raw/e5_competence_switching_screening.csv';
@@ -25,7 +28,17 @@ function run_e5_competence_switching_screening(output_path, R)
   Theta = 0.8;
   C = 60;
   max_windows = 20;
-  k_grid = [4,7,8,9,10,11,13,15];
+  frozen_k_grid = [4,7,8,9,10,11,13,15];
+  if nargin < 3 || isempty(k_subset)
+    k_grid = frozen_k_grid;
+  else
+    assert(isvector(k_subset) && all(isfinite(k_subset(:))) && ...
+      all(k_subset(:) == floor(k_subset(:))), 'k_subset must contain integers.');
+    k_grid = k_subset(:)';
+    assert(numel(unique(k_grid)) == numel(k_grid), 'k_subset must contain unique values.');
+    assert(all(ismember(k_grid,frozen_k_grid)), ...
+      'k_subset must be a subset of the frozen E5 concentration grid.');
+  end
   ell_s_grid = [0.70,0.80,0.90,1.00];
   omega_grid = [0.6,1.0,1.5];
   pD = ones(1,n)/n;
