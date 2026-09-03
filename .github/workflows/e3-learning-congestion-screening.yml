@@ -1,0 +1,66 @@
+name: E3 Learning-Congestion Screening
+
+on:
+  push:
+    branches:
+      - paper/scarce-interaction-capacity
+    paths:
+      - '.github/workflows/e3-learning-congestion-screening.yml'
+  workflow_dispatch:
+
+jobs:
+  e3-screening:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+
+      - name: Run E3 screening in Octave
+        run: |
+          mkdir -p results/raw results/processed
+          octave --quiet --eval "addpath('experiments/capacity_v0_7'); run_learning_congestion_screening('results/raw/e3_learning_congestion_screening.csv', 200);"
+          test $(( $(wc -l < results/raw/e3_learning_congestion_screening.csv) - 1 )) -eq 44800
+
+      - name: Summarize E3 in Python
+        run: |
+          python3 analysis/capacity_v0_7/summarize_learning_congestion.py \
+            --input results/raw/e3_learning_congestion_screening.csv \
+            --output results/processed/e3_learning_congestion_summary.csv
+          test $(( $(wc -l < results/processed/e3_learning_congestion_summary.csv) - 1 )) -eq 224
+
+      - name: Verify E3 exact invariants
+        run: |
+          python3 - <<'PY'
+          import csv, math
+          with open('results/raw/e3_learning_congestion_screening.csv', newline='') as f:
+              rows = list(csv.DictReader(f))
+          assert len(rows) == 44800
+          for r in rows:
+              if int(float(r['delta_capacity'])) == 1:
+                  assert int(float(r['delta_free'])) == 1
+                  assert float(r['DeltaT']) >= 0
+          endpoint = [r for r in rows if abs(float(r['h'])-1.0) < 1e-12]
+          assert len(endpoint) == 2800
+          for r in endpoint:
+              assert int(float(r['delta_capacity'])) == 1
+              assert int(float(r['delta_free'])) == 1
+              assert float(r['T_capacity']) == 14
+              assert float(r['T_free']) == 14
+              assert float(r['DeltaT']) == 0
+              assert int(float(r['n_blocked'])) == 0
+          print('PASS: E3 pathwise nonnegative delay and h=1 exact endpoint')
+          PY
+
+      - name: Upload E3 screening results
+        uses: actions/upload-artifact@v4
+        with:
+          name: e3-learning-congestion-screening
+          path: |
+            results/raw/e3_learning_congestion_screening.csv
+            results/processed/e3_learning_congestion_summary.csv
+          if-no-files-found: error
