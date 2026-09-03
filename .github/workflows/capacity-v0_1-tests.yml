@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - paper/scarce-interaction-capacity
-      - work/scarce-capacity-coupled-v0.7
     paths:
       - 'src/capacity/**'
       - 'tests/capacity_v0_1/**'
