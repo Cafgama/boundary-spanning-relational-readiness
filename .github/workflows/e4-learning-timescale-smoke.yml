@@ -45,6 +45,13 @@ jobs:
             --output /tmp/e4_summary.csv
           test $(( $(wc -l < /tmp/e4_summary.csv) - 1 )) -eq 168
 
+      - name: Smoke-test preregistered OOS evaluator
+        run: |
+          python3 analysis/capacity_v0_8/evaluate_e4_oos.py \
+            --summary /tmp/e4_summary.csv \
+            --output /tmp/e4_oos_metrics.csv
+          test $(( $(wc -l < /tmp/e4_oos_metrics.csv) - 1 )) -eq 32
+
       - name: Verify alpha 0.08 bridge is trajectory-identical to E3
         run: |
           python3 - <<'PY'
