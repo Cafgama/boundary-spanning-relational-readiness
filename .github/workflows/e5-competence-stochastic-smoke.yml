@@ -58,6 +58,15 @@ jobs:
             --output /tmp/e5_summary.csv
           test $(( $(wc -l < /tmp/e5_summary.csv) - 1 )) -eq 192
 
+      - name: Smoke-test frozen E5 evaluator
+        run: |
+          python3 analysis/capacity_v0_9/evaluate_e5_switching.py \
+            --summary /tmp/e5_summary.csv \
+            --metrics-output /tmp/e5_metrics.csv \
+            --cell-output /tmp/e5_eval_cells.csv
+          test $(( $(wc -l < /tmp/e5_eval_cells.csv) - 1 )) -eq 192
+          test $(( $(wc -l < /tmp/e5_metrics.csv) - 1 )) -gt 10
+
       - name: Audit raw E5 invariants
         run: |
           python3 - <<'PY'
