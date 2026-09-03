@@ -66,3 +66,15 @@ jobs:
             --input /tmp/e1_smoke.csv \
             --output /tmp/e1_summary.csv
           test $(( $(wc -l < /tmp/e1_summary.csv) - 1 )) -eq 81
+
+      - name: Smoke-test E2 raw-data generation
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_6'); run_learning_focus_screening('/tmp/e2_smoke.csv', 1);"
+          test $(( $(wc -l < /tmp/e2_smoke.csv) - 1 )) -eq 10
+
+      - name: Smoke-test E2 Python summary
+        run: |
+          python3 analysis/capacity_v0_6/summarize_learning_focus.py \
+            --input /tmp/e2_smoke.csv \
+            --output /tmp/e2_summary.csv
+          test $(( $(wc -l < /tmp/e2_summary.csv) - 1 )) -eq 10
