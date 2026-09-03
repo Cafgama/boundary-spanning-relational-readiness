@@ -16,8 +16,10 @@ on:
       - 'tests/capacity_v0_7/**'
       - 'experiments/capacity_v0_3/**'
       - 'experiments/capacity_v0_6/**'
+      - 'experiments/capacity_v0_7/**'
       - 'analysis/capacity_v0_3/**'
       - 'analysis/capacity_v0_6/**'
+      - 'analysis/capacity_v0_7/**'
       - '.github/workflows/capacity-v0_1-tests.yml'
   workflow_dispatch:
 
@@ -84,3 +86,32 @@ jobs:
             --input /tmp/e2_smoke.csv \
             --output /tmp/e2_summary.csv
           test $(( $(wc -l < /tmp/e2_summary.csv) - 1 )) -eq 10
+
+      - name: Smoke-test E3 raw-data generation
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_7'); run_learning_congestion_screening('/tmp/e3_smoke.csv', 1);"
+          test $(( $(wc -l < /tmp/e3_smoke.csv) - 1 )) -eq 224
+
+      - name: Smoke-test E3 Python summary
+        run: |
+          python3 analysis/capacity_v0_7/summarize_learning_congestion.py \
+            --input /tmp/e3_smoke.csv \
+            --output /tmp/e3_summary.csv
+          test $(( $(wc -l < /tmp/e3_summary.csv) - 1 )) -eq 224
+
+      - name: Verify exact E3 complete-concentration endpoint
+        run: |
+          python3 - <<'PY'
+          import csv
+          with open('/tmp/e3_smoke.csv', newline='') as f:
+              rows = [r for r in csv.DictReader(f) if abs(float(r['h'])-1.0) < 1e-12]
+          assert len(rows) == 14
+          for r in rows:
+              assert int(float(r['delta_capacity'])) == 1
+              assert int(float(r['delta_free'])) == 1
+              assert float(r['T_capacity']) == 14
+              assert float(r['T_free']) == 14
+              assert float(r['DeltaT']) == 0
+              assert int(float(r['n_blocked'])) == 0
+          print('PASS: E3 h=1 exact zero-delay endpoint')
+          PY
