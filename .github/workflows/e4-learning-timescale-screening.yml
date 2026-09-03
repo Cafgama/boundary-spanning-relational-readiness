@@ -1,0 +1,83 @@
+name: E4 learning-timescale screening
+
+on:
+  push:
+    branches:
+      - work/e4-learning-timescale-oos
+    paths:
+      - '.github/workflows/e4-learning-timescale-screening.yml'
+  workflow_dispatch:
+
+jobs:
+  e4-screening:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+
+      - name: Generate frozen E4 deterministic predictions
+        run: |
+          mkdir -p results/raw results/processed
+          octave --quiet --eval "addpath('experiments/capacity_v0_8'); run_e4_predata_predictions('results/processed/e4_predata_predictions.csv');"
+          test $(( $(wc -l < results/processed/e4_predata_predictions.csv) - 1 )) -eq 168
+
+      - name: Run E4 stochastic screening in Octave
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_8'); run_e4_learning_timescale_screening('results/raw/e4_learning_timescale_screening.csv', 200);"
+          test $(( $(wc -l < results/raw/e4_learning_timescale_screening.csv) - 1 )) -eq 33600
+
+      - name: Summarize E4 screening
+        run: |
+          python3 analysis/capacity_v0_8/summarize_e4_learning_timescale.py \
+            --input results/raw/e4_learning_timescale_screening.csv \
+            --output results/processed/e4_learning_timescale_summary.csv
+          test $(( $(wc -l < results/processed/e4_learning_timescale_summary.csv) - 1 )) -eq 168
+
+      - name: Evaluate preregistered E4 OOS metrics
+        run: |
+          python3 analysis/capacity_v0_8/evaluate_e4_oos.py \
+            --summary results/processed/e4_learning_timescale_summary.csv \
+            --output results/processed/e4_oos_metrics.csv
+          test $(( $(wc -l < results/processed/e4_oos_metrics.csv) - 1 )) -eq 32
+          cat results/processed/e4_oos_metrics.csv
+
+      - name: Verify exact E4 endpoint identities in all replications
+        run: |
+          python3 - <<'PY'
+          import csv
+          expected = {0.6:21.0, 1.0:45.0, 1.5:75.0}
+          with open('results/raw/e4_learning_timescale_screening.csv', newline='') as fh:
+              rows = list(csv.DictReader(fh))
+
+          slow = [r for r in rows if r['policy']=='uniform' and int(r['k'])==15 and abs(float(r['alpha'])-0.06)<1e-12]
+          assert len(slow) == 600, len(slow)
+          for r in slow:
+              om = float(r['Omega'])
+              D = int(r['D'])
+              assert float(r['T_free']) == 18.0, r
+              assert float(r['T_capacity']) == D + 3, r
+              assert float(r['DeltaT']) == expected[om], r
+
+          fast = [r for r in rows if r['policy']=='uniform' and int(r['k'])==15 and float(r['alpha']) in (0.08,0.10,0.12)]
+          assert len(fast) == 1800, len(fast)
+          for r in fast:
+              assert float(r['DeltaT']) == 0.0, r
+          print('PASS: all exact E4 complete-concentration identities hold')
+          PY
+
+      - name: Upload E4 screening results
+        uses: actions/upload-artifact@v4
+        with:
+          name: e4-learning-timescale-screening
+          path: |
+            results/raw/e4_learning_timescale_screening.csv
+            results/processed/e4_learning_timescale_summary.csv
+            results/processed/e4_predata_predictions.csv
+            results/processed/e4_oos_metrics.csv
+          if-no-files-found: error
