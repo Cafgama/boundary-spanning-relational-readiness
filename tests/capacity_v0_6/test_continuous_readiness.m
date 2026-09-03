@@ -91,4 +91,19 @@ state_after = rng();
 assert(isequal(state_before, state_after), ...
   'No-capacity interface simulator must preserve caller RNG state.');
 
+%% 12. Fast ell=1 path is exactly equivalent to the transparent simulator.
+h_grid = [0, 0.3, 0.6, 0.9];
+for kk = 1:numel(h_grid)
+  pp = one_heavy_responsibility(4, h_grid(kk));
+  seed = 9000 + kk;
+  slow = simulate_no_capacity_interface_readiness(pp, pp, w0, alpha, 1, 1, Theta, 300, seed, seed+1000);
+  fast = simulate_no_capacity_interface_readiness_fast_ell1(pp, pp, w0, alpha, Theta, 300, seed);
+  assert(isequaln(slow.T, fast.T) && isequaln(slow.TA, fast.TA) && ...
+    isequaln(slow.TB, fast.TB) && slow.delta == fast.delta, ...
+    'Fast ell=1 first-passage times differ from transparent simulator.');
+  assert(abs(slow.WA-fast.WA) < tol && abs(slow.WB-fast.WB) < tol && ...
+    abs(slow.Wmin-fast.Wmin) < tol, ...
+    'Fast ell=1 final readiness differs from transparent simulator.');
+end
+
 fprintf('PASS: continuous-readiness tests.\n');
