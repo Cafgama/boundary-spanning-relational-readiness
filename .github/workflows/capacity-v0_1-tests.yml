@@ -18,9 +18,12 @@ on:
       - 'experiments/capacity_v0_3/**'
       - 'experiments/capacity_v0_6/**'
       - 'experiments/capacity_v0_7/**'
+      - 'experiments/capacity_v0_8/**'
       - 'analysis/capacity_v0_3/**'
       - 'analysis/capacity_v0_6/**'
       - 'analysis/capacity_v0_7/**'
+      - 'analysis/capacity_v0_8/**'
+      - 'results/processed/e3_learning_congestion_summary.csv'
       - '.github/workflows/capacity-v0_1-tests.yml'
   workflow_dispatch:
 
@@ -120,3 +123,19 @@ jobs:
               assert int(float(r['n_blocked'])) == 0
           print('PASS: E3 h=1 exact zero-delay endpoint')
           PY
+
+      - name: Generate v0.8 predictions on the E3 grid
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_8'); run_e3_fluid_predictions('/tmp/e3_fluid_predictions.csv');"
+          test $(( $(wc -l < /tmp/e3_fluid_predictions.csv) - 1 )) -eq 224
+
+      - name: Compare v0.8 predictions with official E3 summary
+        run: |
+          python3 analysis/capacity_v0_8/compare_fluid_learning_to_e3.py \
+            --summary results/processed/e3_learning_congestion_summary.csv \
+            --predictions /tmp/e3_fluid_predictions.csv \
+            --comparison-output /tmp/e3_fluid_comparison.csv \
+            --metrics-output /tmp/e3_fluid_metrics.csv
+          test $(( $(wc -l < /tmp/e3_fluid_comparison.csv) - 1 )) -eq 224
+          test $(( $(wc -l < /tmp/e3_fluid_metrics.csv) - 1 )) -eq 28
+          cat /tmp/e3_fluid_metrics.csv
