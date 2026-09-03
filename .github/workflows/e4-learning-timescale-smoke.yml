@@ -1,0 +1,124 @@
+name: E4 learning-timescale smoke
+
+on:
+  push:
+    branches:
+      - work/e4-learning-timescale-oos
+    paths:
+      - 'experiments/capacity_v0_8/**'
+      - 'analysis/capacity_v0_8/**'
+      - 'docs/capacity_experiment_e4_design.md'
+      - '.github/workflows/e4-learning-timescale-smoke.yml'
+  workflow_dispatch:
+
+jobs:
+  e4-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+
+      - name: Generate E4 deterministic pre-data predictions
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_8'); run_e4_predata_predictions('/tmp/e4_predata.csv');"
+          test $(( $(wc -l < /tmp/e4_predata.csv) - 1 )) -eq 168
+
+      - name: Generate E3 bridge smoke
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_7'); run_learning_congestion_screening('/tmp/e3_bridge.csv', 1);"
+          test $(( $(wc -l < /tmp/e3_bridge.csv) - 1 )) -eq 224
+
+      - name: Generate E4 stochastic smoke
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_8'); run_e4_learning_timescale_screening('/tmp/e4_smoke.csv', 1);"
+          test $(( $(wc -l < /tmp/e4_smoke.csv) - 1 )) -eq 168
+
+      - name: Summarize E4 stochastic smoke
+        run: |
+          python3 analysis/capacity_v0_8/summarize_e4_learning_timescale.py \
+            --input /tmp/e4_smoke.csv \
+            --output /tmp/e4_summary.csv
+          test $(( $(wc -l < /tmp/e4_summary.csv) - 1 )) -eq 168
+
+      - name: Verify alpha 0.08 bridge is trajectory-identical to E3
+        run: |
+          python3 - <<'PY'
+          import csv, math
+
+          def f(x):
+              try:
+                  return float(x)
+              except Exception:
+                  return math.nan
+
+          def same(a,b,tol=1e-12):
+              if math.isnan(a) and math.isnan(b):
+                  return True
+              return abs(a-b) <= tol
+
+          with open('/tmp/e3_bridge.csv', newline='') as fh:
+              e3 = list(csv.DictReader(fh))
+          with open('/tmp/e4_smoke.csv', newline='') as fh:
+              e4 = [r for r in csv.DictReader(fh) if abs(float(r['alpha'])-0.08) < 1e-12]
+
+          omega_keep = {0.6,1.0,1.5}
+          k_keep = {0,4,7,10,13,14,15}
+          e3 = [r for r in e3 if int(r['k']) in k_keep and float(r['Omega']) in omega_keep]
+          assert len(e3) == 42, len(e3)
+          assert len(e4) == 42, len(e4)
+
+          def key(r):
+              return (r['policy'], int(r['k']), round(float(r['Omega']),12), int(r['replication']))
+
+          d3 = {key(r): r for r in e3}
+          d4 = {key(r): r for r in e4}
+          assert set(d3) == set(d4)
+
+          fields = ['demand_seed','T_capacity','T_capacity_tilde','delta_capacity',
+                    'T_free','T_free_tilde','delta_free','DeltaT','n_attempted',
+                    'n_served','n_blocked','blocked_fraction','first_block_attempt',
+                    'n_windows_started','Wmin_final']
+          for k in d3:
+              a,b = d3[k],d4[k]
+              for field in fields:
+                  assert same(f(a[field]),f(b[field])), (k,field,a[field],b[field])
+          print('PASS: E4 alpha=0.08 bridge is trajectory-identical to E3')
+          PY
+
+      - name: Verify exact h=1 alpha=0.06 endpoint reversal
+        run: |
+          python3 - <<'PY'
+          import csv
+          expected = {0.6:21.0, 1.0:45.0, 1.5:75.0}
+          with open('/tmp/e4_smoke.csv', newline='') as fh:
+              rows = [r for r in csv.DictReader(fh)
+                      if r['policy']=='uniform'
+                      and int(r['k'])==15
+                      and abs(float(r['alpha'])-0.06)<1e-12]
+          assert len(rows) == 3, len(rows)
+          for r in rows:
+              om = float(r['Omega'])
+              D = int(r['D'])
+              assert float(r['T_free']) == 18.0, r
+              assert float(r['T_capacity']) == D + 3, r
+              assert float(r['DeltaT']) == expected[om], r
+          print('PASS: exact E4 endpoint delays 21, 45, 75')
+          PY
+
+      - name: Verify pathwise monotonicity in smoke
+        run: |
+          python3 - <<'PY'
+          import csv, math
+          with open('/tmp/e4_smoke.csv', newline='') as fh:
+              rows = list(csv.DictReader(fh))
+          for r in rows:
+              x = float(r['DeltaT'])
+              if math.isfinite(x):
+                  assert x >= 0, r
+          print('PASS: all estimable E4 smoke delays are nonnegative')
+          PY
