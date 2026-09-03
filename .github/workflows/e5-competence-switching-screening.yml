@@ -1,0 +1,106 @@
+name: E5 competence-switching screening
+
+on:
+  push:
+    branches:
+      - work/e5-competence-switching
+    paths:
+      - '.github/workflows/e5-competence-switching-screening.yml'
+  workflow_dispatch:
+
+jobs:
+  e5-slice:
+    strategy:
+      fail-fast: false
+      matrix:
+        k: [4, 7, 8, 9, 10, 11, 13, 15]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out frozen E5 implementation
+        uses: actions/checkout@v4
+
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+
+      - name: Run E5 k=${{ matrix.k }} slice
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_9'); run_e5_competence_switching_screening('/tmp/e5_k${{ matrix.k }}.csv',200,${{ matrix.k }});"
+          test $(( $(wc -l < /tmp/e5_k${{ matrix.k }}.csv) - 1 )) -eq 4800
+
+      - name: Upload immutable E5 slice
+        uses: actions/upload-artifact@v4
+        with:
+          name: e5-k-${{ matrix.k }}
+          path: /tmp/e5_k${{ matrix.k }}.csv
+
+  e5-combine-evaluate:
+    needs: e5-slice
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out frozen E5 analysis
+        uses: actions/checkout@v4
+
+      - name: Download all E5 slices
+        uses: actions/download-artifact@v4
+        with:
+          pattern: e5-k-*
+          path: /tmp/e5_slices
+          merge-multiple: true
+
+      - name: Combine immutable slices
+        run: |
+          python3 analysis/capacity_v0_9/combine_e5_slices.py \
+            --input-dir /tmp/e5_slices \
+            --output /tmp/e5_competence_switching_raw.csv \
+            --replications 200
+          test $(( $(wc -l < /tmp/e5_competence_switching_raw.csv) - 1 )) -eq 38400
+
+      - name: Summarize E5 production
+        run: |
+          python3 analysis/capacity_v0_9/summarize_e5_competence_switching.py \
+            --input /tmp/e5_competence_switching_raw.csv \
+            --output /tmp/e5_competence_switching_summary.csv
+          test $(( $(wc -l < /tmp/e5_competence_switching_summary.csv) - 1 )) -eq 192
+
+      - name: Evaluate frozen switching predictions
+        run: |
+          python3 analysis/capacity_v0_9/evaluate_e5_switching.py \
+            --summary /tmp/e5_competence_switching_summary.csv \
+            --metrics-output /tmp/e5_switching_metrics.csv \
+            --cell-output /tmp/e5_switching_evaluation_cells.csv
+          cat /tmp/e5_switching_metrics.csv
+
+      - name: Audit production invariants
+        run: |
+          python3 - <<'PY'
+          import csv
+          from collections import defaultdict
+          with open('/tmp/e5_competence_switching_raw.csv',newline='') as f:
+              rows=list(csv.DictReader(f))
+          assert len(rows)==38400
+          assert all(float(r['capacity_penalty_tilde']) >= -1e-12 for r in rows)
+          ladders=defaultdict(list)
+          for r in rows:
+              key=(r['policy'],r['Omega'],r['k'],r['replication'])
+              ladders[key].append((float(r['ell_s']),float(r['T_capacity_tilde']),float(r['T_free_tilde'])))
+          assert len(ladders)==8*3*2*200
+          for key,v in ladders.items():
+              v=sorted(v)
+              assert [x[0] for x in v]==[0.7,0.8,0.9,1.0]
+              for i in range(3):
+                  assert v[i+1][1] <= v[i][1] + 1e-12, (key,v)
+                  assert v[i+1][2] <= v[i][2] + 1e-12, (key,v)
+          print('PASS: all E5 production pathwise invariants')
+          PY
+
+      - name: Upload combined E5 results
+        uses: actions/upload-artifact@v4
+        with:
+          name: e5-competence-switching-screening
+          path: |
+            /tmp/e5_competence_switching_raw.csv
+            /tmp/e5_competence_switching_summary.csv
+            /tmp/e5_switching_metrics.csv
+            /tmp/e5_switching_evaluation_cells.csv
