@@ -1,0 +1,43 @@
+name: E2 Learning Focus Screening
+
+on:
+  push:
+    branches:
+      - paper/scarce-interaction-capacity
+    paths:
+      - '.github/workflows/e2-learning-focus-screening.yml'
+  workflow_dispatch:
+
+jobs:
+  e2-screening:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+
+      - name: Run E2 screening in Octave
+        run: |
+          mkdir -p results/raw results/processed
+          octave --quiet --eval "addpath('experiments/capacity_v0_6'); run_learning_focus_screening('results/raw/e2_learning_focus_screening.csv', 1000);"
+          test $(( $(wc -l < results/raw/e2_learning_focus_screening.csv) - 1 )) -eq 10000
+
+      - name: Summarize E2 in Python
+        run: |
+          python3 analysis/capacity_v0_6/summarize_learning_focus.py \
+            --input results/raw/e2_learning_focus_screening.csv \
+            --output results/processed/e2_learning_focus_summary.csv
+          test $(( $(wc -l < results/processed/e2_learning_focus_summary.csv) - 1 )) -eq 10
+
+      - name: Upload E2 screening results
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2-learning-focus-screening
+          path: |
+            results/raw/e2_learning_focus_screening.csv
+            results/processed/e2_learning_focus_summary.csv
+          if-no-files-found: error
