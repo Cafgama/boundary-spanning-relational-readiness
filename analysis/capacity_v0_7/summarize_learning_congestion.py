@@ -1,0 +1,156 @@
+#!/usr/bin/env python3
+"""Summarize E3 learning-focus x congestion screening data.
+
+Uses only the Python standard library. The primary finite-horizon estimator is
+mean(T_capacity_tilde), which is the empirical RMST through the common cell
+horizon. Observed-time means are reported only as descriptive quantities.
+"""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import math
+import statistics
+from collections import defaultdict
+from pathlib import Path
+from typing import Dict, List, Tuple
+
+GroupKey = Tuple[str, float, float]
+
+
+def parse_float(value: str) -> float:
+    return float(value)
+
+
+def quantile(values: List[float], q: float) -> float:
+    if not values:
+        return math.nan
+    xs = sorted(values)
+    if len(xs) == 1:
+        return xs[0]
+    pos = q * (len(xs) - 1)
+    lo = int(math.floor(pos))
+    hi = int(math.ceil(pos))
+    if lo == hi:
+        return xs[lo]
+    w = pos - lo
+    return xs[lo] * (1 - w) + xs[hi] * w
+
+
+def finite(values: List[float]) -> List[float]:
+    return [x for x in values if math.isfinite(x)]
+
+
+def mean_or_nan(values: List[float]) -> float:
+    return statistics.fmean(values) if values else math.nan
+
+
+def read_groups(path: Path):
+    groups: Dict[GroupKey, List[dict]] = defaultdict(list)
+    with path.open(newline="", encoding="utf-8") as fh:
+        reader = csv.DictReader(fh)
+        required = {
+            "policy", "replication", "h", "H", "C", "D", "Omega",
+            "Lambda", "chi", "t0_real", "t0_integer", "Psi",
+            "T_capacity", "T_capacity_tilde", "delta_capacity",
+            "T_free", "T_free_tilde", "delta_free", "DeltaT",
+            "n_attempted", "n_served", "n_blocked", "blocked_fraction",
+            "any_block", "first_block_attempt", "n_windows_started",
+            "Wmin_final",
+        }
+        missing = required.difference(reader.fieldnames or [])
+        if missing:
+            raise ValueError(f"Missing required columns: {sorted(missing)}")
+        for row in reader:
+            key = (row["policy"], float(row["h"]), float(row["Omega"]))
+            groups[key].append(row)
+    if not groups:
+        raise ValueError("Input file contains no E3 data rows")
+    return groups
+
+
+def constant(rows: List[dict], field: str) -> float:
+    vals = [float(r[field]) for r in rows]
+    if max(vals) - min(vals) > 1e-10:
+        raise ValueError(f"{field} varies within one E3 cell")
+    return statistics.fmean(vals)
+
+
+def summarize_group(key: GroupKey, rows: List[dict]) -> dict:
+    policy, h, omega = key
+    delta_cap = [int(r["delta_capacity"]) for r in rows]
+    delta_free = [int(r["delta_free"]) for r in rows]
+    t_tilde = [float(r["T_capacity_tilde"]) for r in rows]
+    observed_t = [float(r["T_capacity"]) for r in rows if int(r["delta_capacity"]) == 1]
+    observed_free = [float(r["T_free"]) for r in rows if int(r["delta_free"]) == 1]
+    delays = finite([float(r["DeltaT"]) for r in rows])
+    blocked_fraction = [float(r["blocked_fraction"]) for r in rows]
+    any_block = [int(r["any_block"]) for r in rows]
+    first_block = finite([float(r["first_block_attempt"]) for r in rows])
+    n_blocked = [int(r["n_blocked"]) for r in rows]
+    n_windows = [int(r["n_windows_started"]) for r in rows]
+
+    if any(x < -1e-12 for x in delays):
+        raise ValueError(f"Negative paired delay found in cell {key}")
+
+    return {
+        "policy": policy,
+        "h": h,
+        "H": constant(rows, "H"),
+        "C": int(round(constant(rows, "C"))),
+        "D": int(round(constant(rows, "D"))),
+        "Omega": omega,
+        "Lambda": constant(rows, "Lambda"),
+        "chi": constant(rows, "chi"),
+        "t0_real": constant(rows, "t0_real"),
+        "t0_integer": int(round(constant(rows, "t0_integer"))),
+        "Psi": constant(rows, "Psi"),
+        "R": len(rows),
+        "event_fraction_capacity": statistics.fmean(delta_cap),
+        "event_fraction_free": statistics.fmean(delta_free),
+        "rmst_capacity": statistics.fmean(t_tilde),
+        "mean_T_observed": mean_or_nan(observed_t),
+        "median_T_observed": quantile(observed_t, 0.50),
+        "mean_T_free_observed": mean_or_nan(observed_free),
+        "n_delay_estimable": len(delays),
+        "mean_DeltaT": mean_or_nan(delays),
+        "median_DeltaT": quantile(delays, 0.50),
+        "q90_DeltaT": quantile(delays, 0.90),
+        "q95_DeltaT": quantile(delays, 0.95),
+        "max_DeltaT": max(delays) if delays else math.nan,
+        "mean_blocked_fraction": statistics.fmean(blocked_fraction),
+        "prob_any_block": statistics.fmean(any_block),
+        "mean_n_blocked": statistics.fmean(n_blocked),
+        "mean_first_block_attempt_conditional": mean_or_nan(first_block),
+        "mean_windows_started": statistics.fmean(n_windows),
+    }
+
+
+def write_summary(groups, output_path: Path) -> None:
+    rows = [summarize_group(k, v) for k, v in groups.items()]
+    rows.sort(key=lambda r: (r["policy"], r["Omega"], r["h"]))
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fieldnames = list(rows[0].keys())
+    with output_path.open("w", newline="", encoding="utf-8") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input", required=True, type=Path)
+    parser.add_argument("--output", required=True, type=Path)
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+    groups = read_groups(args.input)
+    write_summary(groups, args.output)
+    print(f"Wrote E3 summary to {args.output}")
+
+
+if __name__ == "__main__":
+    main()
