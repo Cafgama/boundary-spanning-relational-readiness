@@ -88,10 +88,17 @@ expected_w1 = 1 - (1-w0)*(1-alpha);
 assert(blocked_case.WA > expected_w1 + tol, ...
   'Transferable memory appears to have reset across capacity windows.');
 
-%% 6. Realized load metrics are reported from integer capacities.
-assert(abs(cpl.Omega_realized - D2/C2) < tol, 'Incorrect realized Omega.');
-assert(abs(cpl.Lambda_realized - 2) < tol, 'Expected Lambda=2 in the canonical mismatch case.');
-assert(abs(cpl.chi_realized - 4) < tol, 'Expected chi=Omega*Lambda=4.');
+%% 6. Realized load metrics use integer-realized capacity shares, not targets.
+% C2=30 and target x=(1/4,... ) realizes c=(8,8,7,7), so the heavy
+% carrier has x_realized=8/30 and Lambda=0.5/(8/30)=1.875 rather than 2.
+assert(abs(cpl.Omega_realized - adm.Omega_realized) < tol, ...
+  'Coupled and admission-only realized Omega must agree.');
+assert(abs(cpl.Lambda_realized - adm.Lambda_realized) < tol, ...
+  'Coupled and admission-only realized Lambda must agree.');
+assert(abs(cpl.chi_realized - adm.chi_realized) < tol, ...
+  'Coupled and admission-only realized chi must agree.');
+assert(abs(cpl.Lambda_realized - 1.875) < tol, ...
+  'Expected Lambda=1.875 after largest-remainder integer realization.');
 
 %% 7. Fixed seeds reproduce the complete coupled first passage.
 r1 = simulate_capacity_learning_readiness(p2, p2, x2, x2, w0, alpha, 0.7, 0.7, ...
