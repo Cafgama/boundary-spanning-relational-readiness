@@ -57,13 +57,11 @@ function run_e5_competence_switching_screening(output_path, R)
     T_max = D*max_windows;
     assert(abs(D/C-Omega) < 1e-12,'Omega must be integer-compatible with C.');
 
-    % Deterministic diffuse benchmark for this scarcity level.
     FD = fluid_learning_readiness_symmetric( ...
       Omega,pD,xD,w0,alpha,ell_o,Theta,C,max_windows);
     assert(FD.delta == 1,'Diffuse deterministic benchmark failed to cross.');
 
     for rep = 1:R
-      % Diffuse ordinary benchmark uses the locked k=0 seed family.
       dseedD = 530000000 + io*10000 + rep;
       lseedD = 630000000 + io*10000 + rep;
 
@@ -89,14 +87,11 @@ function run_e5_competence_switching_screening(output_path, R)
 
         policies = {'matched','uniform'};
         xpol = {p,xD};
-        cap_times = NaN(2,numel(ell_s_grid));
         cap_tildes = NaN(2,numel(ell_s_grid));
         cap_deltas = zeros(2,numel(ell_s_grid));
-        free_times = NaN(1,numel(ell_s_grid));
         free_tildes = NaN(1,numel(ell_s_grid));
         free_deltas = zeros(1,numel(ell_s_grid));
 
-        % Precompute deterministic threshold classification for each policy.
         theory = cell(1,2);
         M = cell(1,2);
         for ip = 1:2
@@ -112,7 +107,6 @@ function run_e5_competence_switching_screening(output_path, R)
 
           free = simulate_no_capacity_interface_readiness( ...
             p,p,w0,alpha,ell,ell,Theta,T_max,dseed,lseed);
-          free_times(ie) = free.T;
           free_tildes(ie) = free.T_tilde;
           free_deltas(ie) = free.delta;
 
@@ -122,7 +116,6 @@ function run_e5_competence_switching_screening(output_path, R)
             cap = simulate_capacity_learning_readiness( ...
               p,p,x,x,w0,alpha,ell,ell,Theta,C,D,max_windows,dseed,lseed);
 
-            cap_times(ip,ie) = cap.T;
             cap_tildes(ip,ie) = cap.T_tilde;
             cap_deltas(ip,ie) = cap.delta;
 
@@ -142,10 +135,12 @@ function run_e5_competence_switching_screening(output_path, R)
             architecture_adv = cap.T_tilde-diff_cap.T_tilde;
             theory_adv = F.T_real-FD.T_real;
 
+            % Exactly 47 format specifiers for the 47 declared CSV columns.
             fprintf(fid,['%s,%d,%d,%d,%d,%d,%.15g,%.15g,%.15g,%.15g,' ...
               '%.15g,%.15g,%.15g,%d,%d,%.15g,%d,%d,%.15g,%.15g,%s,%.15g,' ...
-              '%.15g,%.15g,%.15g,%.15g,%d,%d,%.15g,%d,%d,%.15g,%d,%d,%d,' ...
-              '%.15g,%.15g,%d,%.15g,%.15g,%d,%.15g,%d,%d,%.15g,%.15g\n'], ...
+              '%.15g,%.15g,%.15g,%.15g,%.15g,%d,%.15g,%.15g,%d,%.15g,' ...
+              '%d,%d,%d,%.15g,%.15g,%d,%.15g,%.15g,%.15g,%d,%.15g,%.15g,' ...
+              '%d,%.15g,%.15g\n'], ...
               policy,rep,dseed,lseed,n,k,h,H,ell_o,ell_s,w0,alpha,Theta,C,D,Omega, ...
               max_windows,T_max,M{ip}.Lambda,M{ip}.chi,theory{ip}.regime,theory{ip}.ell_star, ...
               F.T_real,FD.T_real,theory_adv, ...
@@ -159,8 +154,6 @@ function run_e5_competence_switching_screening(output_path, R)
           end
         end
 
-        % Exact CRN competence monotonicity audits. T_tilde must weakly fall as
-        % specialist competence increases, both with and without capacity.
         for ie = 1:(numel(ell_s_grid)-1)
           assert(free_tildes(ie+1) <= free_tildes(ie) + 1e-12, ...
             'Free E5 trajectory violates competence monotonicity.');
