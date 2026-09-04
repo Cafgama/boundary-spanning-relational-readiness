@@ -1,0 +1,29 @@
+name: E6 transient shock pre-data gate
+
+on:
+  push:
+    branches:
+      - work/e6-transient-capacity-shock
+    paths:
+      - 'src/capacity/transient_shock_capacity.m'
+      - 'src/capacity/simulate_transient_capacity_shock_readiness.m'
+      - 'tests/capacity_v0_10/**'
+      - 'docs/capacity_experiment_e6_design.md'
+      - '.github/workflows/e6-transient-shock-predata.yml'
+  workflow_dispatch:
+
+jobs:
+  e6-predata:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+
+      - name: Run Model v0.10 transient-shock tests
+        run: |
+          octave --quiet --eval "cd('tests/capacity_v0_10'); run_capacity_v0_10_tests"
