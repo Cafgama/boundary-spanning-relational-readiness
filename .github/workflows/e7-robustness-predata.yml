@@ -9,6 +9,7 @@ on:
       - 'src/capacity/simulate_capacity_learning_readiness_pairing.m'
       - 'src/capacity/fluid_learning_readiness_assortative_symmetric.m'
       - 'tests/capacity_v0_11/**'
+      - 'experiments/capacity_v0_11/run_e7_predata_predictions.m'
       - 'docs/capacity_experiment_e7_robustness_design.md'
       - '.github/workflows/e7-robustness-predata.yml'
   workflow_dispatch:
@@ -28,3 +29,41 @@ jobs:
       - name: Run Model v0.11 robustness tests
         run: |
           octave --quiet --eval "cd('tests/capacity_v0_11'); run_capacity_v0_11_tests"
+
+      - name: Generate frozen E7 theory predictions
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_predata_predictions('/tmp/e7_theory_predictions.csv');"
+          test $(( $(wc -l < /tmp/e7_theory_predictions.csv) - 1 )) -eq 264
+
+      - name: Audit exact E7 prediction identities
+        run: |
+          python3 - <<'PY'
+          import csv, math
+          with open('/tmp/e7_theory_predictions.csv', newline='') as f:
+              rows=list(csv.DictReader(f))
+          assert len(rows)==264
+          # Panel A: h=1 exact T=14 for both policies across all n and Omega.
+          for r in rows:
+              if r['panel']=='A' and abs(float(r['h'])-1)<1e-12:
+                  assert abs(float(r['exact_T_expected'])-14)<1e-12
+                  assert abs(float(r['exact_delay_expected']))<1e-12
+          # Panel B C=40, h=1, uniform exact delays 14,30,50.
+          expected={0.6:14.0,1.0:30.0,1.5:50.0}
+          for r in rows:
+              if r['panel']=='B' and r['policy']=='uniform' and int(float(r['C']))==40 and abs(float(r['h'])-1)<1e-12:
+                  assert abs(float(r['exact_delay_expected'])-expected[float(r['Omega'])])<1e-12
+          # Panel C h=1 uniform: Theta .7/.8 safe, .9 penalty 45.
+          for r in rows:
+              if r['panel']=='C' and r['policy']=='uniform' and abs(float(r['h'])-1)<1e-12:
+                  th=float(r['Theta']); d=float(r['exact_delay_expected'])
+                  if abs(th-.9)<1e-12: assert abs(d-45)<1e-12
+                  else: assert abs(d)<1e-12
+          print('PASS: frozen E7 exact prediction identities')
+          PY
+
+      - name: Upload pre-data predictions
+        uses: actions/upload-artifact@v4
+        with:
+          name: e7-predata-theory-predictions
+          path: /tmp/e7_theory_predictions.csv
+          retention-days: 90
