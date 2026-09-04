@@ -8,106 +8,63 @@ E6 starts from the frozen post-E5 checkpoint
 
 `lock/scarce-capacity-competence-switching-postE5`.
 
-E5 established that the deterministic first-moment theory predicts architecture rankings very well globally but that finite-window stochastic corrections can shift rankings near switching boundaries. E6 therefore asks a different question: **how much delay risk is hidden in the distribution when interface capacity is temporarily reduced?**
+E5 established that deterministic first-moment theory predicts architecture rankings very well globally, while finite-window stochastic corrections can shift rankings near switching boundaries. E6 therefore asks a different question: **how much delay risk is hidden in the distribution when interface capacity is temporarily reduced?**
 
-E6 does not refit E5 thresholds and does not change the learning or demand-generation rules.
+E6 does not refit E5 thresholds and does not change demand generation, learning effectiveness, or learning-state semantics.
 
 ## 1. Natural-language world
 
-Two modules are building cross-boundary coordination readiness through repeated interactions.
+Two modules build cross-boundary coordination readiness through repeated interaction. Actor `i` has a responsibility share `p_i`, baseline integer interaction capacity `c_i`, learning effectiveness `ell_i`, and persistent transferable learning state `w_i`.
 
-Each actor has:
+Normally each capacity window begins with the baseline capacities. E6 introduces one temporary system-wide disruption: during the **first capacity window only**, every actor retains a fraction `gamma` of baseline interaction capacity. Lost capacity disappears for that window. Demand responsibility, pairing, competence, and learning rules remain unchanged. From the second window onward baseline capacity is fully restored.
 
-- a responsibility share `p_i`, determining how much cross-boundary demand reaches that actor;
-- a baseline capacity allocation `c_i`, determining how many interactions the actor can process in a capacity window;
-- a learning effectiveness `ell_i`, determining the probability that an admitted interaction produces useful transferable learning;
-- a persistent actor-level learning state `w_i`.
+This is a minimal transient capacity-loss shock. A carrier-specific outage is deliberately postponed because it would immediately add a second mechanism — localization and substitutability of the disruption.
 
-Normally, each capacity window begins with the baseline actor capacities.
+## 2. Shock-mechanism decision
 
-E6 introduces one temporary system-wide disruption: during the **first capacity window only**, every actor retains only a fraction `gamma` of baseline interaction capacity. The lost capacity disappears for that window. Demand responsibility, demand pairing, competence, and learning rules do not change. From the second window onward, baseline capacity is fully restored.
+Three alternatives were considered.
 
-This is a minimal transient capacity-loss shock. It represents situations such as a temporary loss of interface bandwidth, operational disruption, or a short-lived reduction in available coordination time.
+**Demand surge:** analytically similar to increasing `Omega`, but nearly redundant with the scarcity experiments already performed.
 
-The shock is deliberately global rather than carrier-specific in E6. A carrier-specific outage would introduce a second mechanism — localization/substitutability of the disruption — and is reserved for robustness or a later extension.
+**Carrier-specific outage:** directly tests specialist fragility, but requires a new rule for responsibility/capacity reassignment.
 
-## 2. Why this shock is the minimal extension
-
-Three shock mechanisms were considered.
-
-### A. Demand surge
-
-Increase `D` temporarily while capacity remains fixed.
-
-Advantage: analytically equivalent to increasing global scarcity.
-
-Disadvantage: it changes the demand process rather than capacity and is nearly redundant with changing `Omega`.
-
-### B. Carrier-specific outage
-
-Reduce the capacity of the high-responsibility carrier only.
-
-Advantage: directly tests specialist fragility.
-
-Disadvantage: immediately introduces a new modelling choice about whether lost capacity or responsibility can be reassigned, so it mixes capacity loss with substitutability.
-
-### C. Proportional global capacity loss — selected
-
-Scale all baseline actor capacities down for one window and restore them afterward.
-
-Advantage: one new mechanism only; architecture and demand shares remain unchanged; the shock has an immediate analytical interpretation in the existing local-stress coordinate.
-
-**E6 selects C.**
+**Proportional global capacity loss — selected:** one new mechanism only; architecture and demand shares remain unchanged; the existing local-load theory yields an immediate shock coordinate.
 
 ## 3. Shock semantics
 
-Let baseline integer actor capacities in one module be
+Let baseline integer capacities satisfy
 
 \[
-c_i,\qquad \sum_i c_i=C.
+c_i\ge0,\qquad \sum_i c_i=C.
 \]
 
-Let
+For retained capacity
 
 \[
-\gamma\in[0,1]
+\gamma\in[0,1],
 \]
 
-be the retained-capacity fraction during the shock window.
-
-For the first capacity window define
+the first-window shock capacities are
 
 \[
-\boxed{c_i^{shock}=\lfloor \gamma c_i\rfloor.}
+\boxed{c_i^{shock}=\lfloor\gamma c_i\rfloor.}
 \]
 
-For all later windows:
+For every later window,
 
 \[
 \boxed{c_i^{normal}=c_i.}
 \]
 
-The floor rule makes the shock capacities nested pathwise as `gamma` decreases and avoids stochastic capacity allocation.
-
-The realized retained module capacity is stored as
+Store the realized module-level retained fraction
 
 \[
 \gamma_{real}=\frac{\sum_i c_i^{shock}}{C}.
 \]
 
-The shock lasts exactly one capacity window of `D` attempted interactions.
+The shock lasts exactly one window of `D` attempted interactions. During that window, demand pairs are generated exactly as in E5; a pair is served iff both endpoints have remaining shock capacity; served interactions consume one unit at both endpoints; blocked attempts consume no capacity and produce no learning; useful learning on a served endpoint occurs independently with probability `ell_i`; and every attempted pair advances the clock. Learning states persist through recovery.
 
-During the shock window:
-
-1. demand pairs are generated exactly as in E5;
-2. a pair is admitted only if both endpoints have remaining shock capacity;
-3. admitted interactions consume one unit from both endpoints;
-4. blocked attempts consume no capacity and produce no learning;
-5. admitted endpoints independently generate useful learning with probability `ell_i`;
-6. learning state persists after the shock;
-7. the attempt clock advances for every attempted pair.
-
-At the second window boundary, baseline capacities are restored and normal Model v0.7 dynamics continue.
+At the second window boundary, baseline actor capacities are restored.
 
 ## 4. Analytical shock coordinate
 
@@ -120,111 +77,108 @@ Ignoring integer rounding, proportional capacity retention changes local offered
 to
 
 \[
-\boxed{\omega_i^{shock}=\frac{\omega_i}{\gamma}.}
+\boxed{\omega_i^{shock}=\frac{\omega_i}{\gamma}}.
 \]
 
-Therefore peak stress becomes
+Hence peak stress becomes
 
 \[
-\boxed{\chi_{shock}=\frac{\chi}{\gamma}.}
+\boxed{\chi_{shock}=\frac{\chi}{\gamma}}.
 \]
 
-For a baseline architecture with `chi < 1`, the deterministic first-exhaustion boundary during the shock window is
+For a baseline architecture with `chi<1`, deterministic first exhaustion during the shock window begins at
 
 \[
-\boxed{\gamma_c=\chi.}
+\boxed{\gamma_c=\chi}.
 \]
 
-This gives E6 a preregistered mechanistic prediction: a transient shock should become qualitatively more damaging when the retained capacity pushes `chi_shock` through one.
+This is a fluid/onset prediction only. The exact finite process remains bilateral and stochastic.
 
-Integer rounding is not absorbed into the theory; the exact realized capacities and `gamma_real` are stored and treated as the finite-system implementation.
+## 5. Critical bilateral-coupling correction
 
-## 5. Why Omega = 0.6 is the primary E6 scarcity level
+A tempting claim would be that componentwise smaller shock capacities must produce a pathwise superset of blocking and therefore a later first-passage time. **That claim is false for this bilateral admission process.**
+
+If a stronger shock blocks an early pair because one endpoint is exhausted, the other endpoint does not consume capacity. That preserved capacity can make a later pair feasible in the stronger-shock trajectory even when the weaker-shock trajectory has already spent that endpoint's capacity. Therefore admitted-pair sets need not be nested across `gamma` even though the capacity vectors are nested.
+
+Consequences fixed before data:
+
+1. capacity vectors must be nested as `gamma` falls;
+2. `gamma=1` must reproduce the no-shock generic model exactly;
+3. **no pathwise monotonicity of `T` across shock severity is imposed or tested as an invariant**;
+4. paired common random numbers are still used to reduce Monte Carlo noise;
+5. individual realizations with negative paired shock delay are mathematically possible and must be retained, not treated as errors.
+
+This bilateral reordering effect is part of the complex-system mechanism, not an implementation defect.
+
+## 6. Primary scarcity level
 
 E6 fixes
 
 \[
-\boxed{\Omega=0.6}
+\boxed{\Omega=0.6}.
 \]
 
-for the primary shock experiment.
-
-At matched capacity and in the diffuse benchmark,
+For matched capacity and for the diffuse benchmark,
 
 \[
-\Lambda=1,\qquad \chi=0.6.
+\Lambda=1,\qquad \chi=0.6,
 \]
 
-Thus the analytical shock boundary occurs at
+so the fluid shock boundary is
 
 \[
-\boxed{\gamma_c=0.6.}
+\boxed{\gamma_c=0.6}.
 \]
 
-The preregistered shock grid will therefore contain points above, at, and below the predicted boundary.
+The shock grid therefore contains points above, at, and below the predicted first-exhaustion boundary. Robustness across `Omega` belongs to E7.
 
-Using a single scarcity level prevents E6 from becoming a second broad parameter sweep. Robustness across `Omega` belongs to E7.
+## 7. Frozen architecture and competence grid
 
-## 6. Frozen architecture grid
-
-Use the same one-heavy family and E5 competence semantics.
-
-Concentration points:
+Use the one-heavy family with
 
 \[
-\boxed{k\in\{4,7,9,15\},\qquad h=k/15.}
+\boxed{k\in\{4,7,9,15\},\qquad h=k/15}.
 \]
 
-These four points have distinct roles in the post-E5 theory:
-
-- `k=4`: relatively low concentration;
-- `k=7`: an E5 boundary-sensitive architecture;
-- `k=9`: a competence-switching architecture;
-- `k=15`: complete concentration endpoint.
+The points represent low concentration, an E5 boundary-sensitive case, a competence-switching case, and the complete-concentration endpoint.
 
 Capacity policies:
 
 \[
-\boxed{\text{matched},\ \text{uniform}.}
+\boxed{\text{matched},\ \text{uniform}}.
 \]
 
 Ordinary competence remains
 
 \[
-\ell_o=0.70.
+\ell_o=0.70,
 \]
 
-Specialist competence grid:
+with specialist competence
 
 \[
-\boxed{\ell_s\in\{0.70,0.90,1.00\}.}
+\boxed{\ell_s\in\{0.70,0.90,1.00\}}.
 \]
 
-All other learning parameters remain frozen:
+Other frozen parameters:
 
 \[
 w_0=0.4,\quad \alpha=0.08,\quad \Theta=0.8,\quad C=60.
 \]
 
-## 7. Shock grid
+## 8. Shock grid
 
-Use retained-capacity fractions
+Use
 
 \[
-\boxed{\gamma\in\{1.0,0.8,0.6,0.5,0.4\}.}
+\boxed{\gamma\in\{1.0,0.8,0.6,0.5,0.4\}}.
 \]
 
-Interpretation:
+`gamma=1` is the no-shock reference; `0.8` lies above the matched/diffuse fluid boundary; `0.6` is the boundary; `0.5` and `0.4` lie below it.
 
-- `gamma=1.0`: no-shock reference;
-- `gamma=0.8`: mild shock, above matched/diffuse first-exhaustion boundary;
-- `gamma=0.6`: theoretical matched/diffuse boundary;
-- `gamma=0.5`: moderate shock, below the boundary;
-- `gamma=0.4`: stronger shock.
+All shock levels for the same architecture and replication use the same complete demand and latent learning streams.
 
-The no-shock trajectory and all shock levels for the same architecture/replication use the same complete demand and latent learning streams.
-
-## 8. Replications and production size
+## 9. Replications and production size
 
 Use
 
@@ -232,33 +186,29 @@ Use
 \boxed{R=1000}
 \]
 
-per concentrated shock cell so that q95 and the upper-tail conditional mean are based on adequate tail counts.
+per concentrated shock cell so q95 and ES95 have adequate tail counts.
 
 The concentrated design contains
 
 \[
-4\times 2\times 3\times 5=120
+4\times2\times3\times5=120
 \]
 
-cells and
+cells, or
 
 \[
 \boxed{120{,}000}
 \]
 
-concentrated trajectories.
+trajectories. The diffuse ordinary benchmark adds five shock cells with `R=1000`, or 5,000 trajectories.
 
-The diffuse ordinary benchmark is evaluated for the same five shock levels with `R=1000`, adding 5,000 trajectories.
+Production may be parallelized by `k` only after an `R=1` slice-equivalence test.
 
-Production should be parallelized by `k` only after slice equivalence is proven at `R=1`.
+## 10. Common-random-number construction
 
-## 9. Common-random-number construction
+For a fixed `(k, ell_s, replication)`, all five `gamma` values and both capacity policies use the same demand and learning seeds. Shock severity and policy do not enter the seeds.
 
-For each fixed `(k, policy, ell_s, replication)`, all five `gamma` levels use the same demand and learning seeds.
-
-Shock severity must not appear in either seed.
-
-Recommended concentrated seed family:
+Concentrated seed family:
 
 \[
 \text{demand seed}=760000000+k\times10^6+i_{\ell}\times10^4+r,
@@ -268,118 +218,101 @@ Recommended concentrated seed family:
 \text{learning seed}=860000000+k\times10^6+i_{\ell}\times10^4+r.
 \]
 
-Matched and uniform policies use the same latent streams.
-
 Diffuse benchmark seeds use `k=0` and `i_ell=0`.
 
-## 10. Exact computational invariants
+## 11. Exact computational invariants
 
-### 10.1 No-shock identity
+### 11.1 No-shock identity
 
-At `gamma=1`, E6 must reproduce the corresponding ordinary Model v0.7 trajectory exactly for identical seeds.
+At `gamma=1`, E6 must reproduce the corresponding Model v0.7 finite-capacity trajectory exactly for identical seeds: first passage, event indicator, blocking counts, productive-learning counts, and final readiness.
 
-### 10.2 Nested shock capacity
+### 11.2 Nested integer shock capacities
 
-For any actor and two retained fractions with
-
-\[
-\gamma_2<\gamma_1,
-\]
-
-shock-window integer capacity must satisfy
-
-\[
-\boxed{c_i^{shock}(\gamma_2)\le c_i^{shock}(\gamma_1).}
-\]
-
-### 10.3 Pathwise shock-delay monotonicity
-
-Because a stronger shock only removes admission opportunities during the first window and all later capacity, demand, and latent learning marks are identical,
-
-\[
-\boxed{T(\gamma_2)\ge T(\gamma_1)}
-\]
-
-for
+For every actor,
 
 \[
 \gamma_2<\gamma_1
+\quad\Rightarrow\quad
+\boxed{c_i^{shock}(\gamma_2)\le c_i^{shock}(\gamma_1)}.
 \]
 
-using censored first-passage time `T_tilde` if needed.
+### 11.3 Recovery identity
 
-This is an exact E6 audit, not an empirical hypothesis.
+From the second capacity window onward, the capacity reset vector must equal the baseline integer capacity vector exactly for every `gamma`.
 
-### 10.4 Shock cannot improve readiness state pathwise
+No stronger pathwise ordering is assumed because bilateral admission can reorder which attempts consume endpoint capacity.
 
-At every attempt after identical initial conditions, the stronger-shock trajectory must not contain a learning event that is absent solely because of greater capacity in the weaker-shock trajectory. The implementation should preserve a subset relation in admitted useful-learning opportunities during the shock window.
+## 12. Primary estimands
 
-## 11. Primary estimands
-
-For every shock cell define paired shock delay relative to its own no-shock trajectory:
+For each replication define signed paired shock delay relative to its own no-shock trajectory:
 
 \[
-\boxed{\Delta T_\gamma=T_\gamma-T_{\gamma=1}.}
+\boxed{\Delta T_\gamma=T_\gamma-T_{\gamma=1}}.
 \]
 
-Primary distributional summaries:
+Because bilateral reordering can produce rare pathwise improvements, `Delta T` is not truncated at zero.
+
+Primary summaries:
 
 1. mean paired shock delay;
 2. median paired shock delay;
 3. q90 paired shock delay;
 4. q95 paired shock delay;
-5. **ES95**, defined as the mean paired shock delay among replications at or above the empirical q95 threshold;
-6. probability that the shock costs at least one full normal window:
-
+5. **ES95**, the mean paired shock delay among observations at or above the empirical q95 threshold;
+6. probability of a delay of at least one normal window,
 \[
-\boxed{P(\Delta T_\gamma\ge D).}
+\boxed{P(\Delta T_\gamma\ge D)}.
 \]
 
 Secondary summaries:
 
 - q99 paired shock delay;
-- mean blocked fraction during the shock window;
-- probability of any blocking during the shock window;
+- probability of a negative paired shock delay `P(Delta T < 0)`;
+- shock-window blocked fraction;
+- probability of any shock-window blocking;
 - first block attempt;
-- number of productive learning events lost relative to no shock.
+- productive learning events during the shock window.
 
 The primary architecture-resilience contrast is the difference between concentrated and diffuse q95/ES95 shock delay at the same `gamma`.
 
-## 12. Frozen hypotheses
+## 13. Frozen hypotheses
 
-### H6.1 — shock boundary
+### H6.1 — fluid shock boundary
 
-For matched capacity and the diffuse benchmark at `Omega=0.6`, distributional shock delay will change sharply as retained capacity moves from above the analytical boundary (`gamma=0.8`) through `gamma=0.6` and below it (`gamma=0.5,0.4`).
+For matched capacity and the diffuse benchmark at `Omega=0.6`, distributional shock delay will increase materially as retained capacity moves from above the fluid boundary (`gamma=0.8`) through `gamma=0.6` and below it (`0.5,0.4`). The hypothesis is distributional, not pathwise.
 
 ### H6.2 — mismatch amplifies tail delay
 
-Uniform-capacity concentrated architectures, which already carry larger `Lambda` and `chi`, will exhibit larger q95 and ES95 shock delays than the matched-capacity version of the same responsibility/competence architecture.
+Uniform-capacity concentrated architectures will exhibit larger q95 and ES95 shock delays than matched versions of the same responsibility/competence architecture because their baseline `Lambda` and `chi` are larger.
 
-### H6.3 — competence accelerates recovery but does not change shock stress
+### H6.3 — competence accelerates recovery but does not change stress
 
-Increasing specialist competence `ell_s` will reduce the post-shock first-passage delay but will not change `Lambda`, baseline `chi`, shock-window `chi_shock`, or the shock-window first-exhaustion condition.
+Increasing `ell_s` will reduce expected and upper-tail recovery delay while leaving `Lambda`, baseline `chi`, and `chi_shock` unchanged.
 
-### H6.4 — concentration can trade speed for resilience
+### H6.4 — speed-resilience trade-off
 
-At least some architectures that outperform the diffuse benchmark in no-shock mean first-passage time will have a larger upper-tail shock delay than the diffuse benchmark under sufficiently strong capacity loss.
+At least some architectures that outperform the diffuse benchmark in no-shock mean first-passage time will exhibit a larger upper-tail shock delay than the diffuse benchmark under sufficiently strong capacity loss.
 
-This is the primary resilience trade-off hypothesis.
+### H6.5 — tail risk contains information absent from the mean
 
-### H6.5 — tail risk contains information absent from mean delay
+Architecture ordering by mean paired shock delay and by q95/ES95 need not be identical near the overload boundary. Both are reported regardless of which favors a given architecture.
 
-Architecture ordering by mean shock delay and by q95/ES95 shock delay need not be identical near the overload boundary. E6 will report both without selecting the more favorable metric post hoc.
+### H6.6 — bilateral reordering is finite-system, not theory failure
 
-## 13. Required execution order
+The fraction of realizations with `Delta T < 0`, if nonzero, is reported as a finite bilateral-admission effect. It does not alter the fluid stress coordinate and is not used to redefine shock severity.
 
-1. implement a shock-capacity helper on integer baseline capacities;
-2. unit-test nesting and exact `gamma=1` identity;
-3. implement the transient-shock first-passage simulator without modifying the E5 generic kernel;
-4. deterministic toy tests for complete blocking and recovery;
-5. `R=1` full-grid smoke with pathwise monotonicity across all gamma ladders;
-6. prove sliced execution equals the full-run subset;
-7. freeze a `preE6` branch;
-8. launch `R=1000` production;
-9. preserve raw and processed production outputs permanently in Git with SHA-256 provenance;
-10. close E6 before any `Omega`, size, topology, or localized-outage robustness study.
+## 14. Required execution order
+
+1. implement an integer shock-capacity helper;
+2. unit-test capacity nesting and boundary cases;
+3. implement a transient-shock simulator without modifying the E5 generic kernel;
+4. prove exact `gamma=1` identity against Model v0.7;
+5. deterministic toy tests for complete first-window capacity loss and second-window recovery;
+6. run an `R=1` full-grid smoke;
+7. prove sliced execution equals the full-run subset;
+8. freeze a `preE6` branch;
+9. launch `R=1000` production;
+10. preserve raw and processed E6 outputs permanently in Git with SHA-256 provenance;
+11. close E6 before any `Omega`, size, topology, or localized-outage robustness study.
 
 No E6 grid change after production data are inspected will be called part of E6.
