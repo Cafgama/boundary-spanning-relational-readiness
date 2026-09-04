@@ -1,0 +1,171 @@
+name: E6 transient shock production
+
+on:
+  push:
+    branches:
+      - work/e6-transient-capacity-shock
+    paths:
+      - '.github/workflows/e6-transient-shock-production.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  e6-slice:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        k: [4, 7, 9, 15]
+    steps:
+      - name: Check out frozen E6 implementation
+        uses: actions/checkout@v4
+        with:
+          ref: lock/scarce-capacity-transient-shock-preE6
+
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+
+      - name: Run E6 k=${{ matrix.k }} production slice
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_10'); run_e6_transient_shock_screening('/tmp/e6_k_${{ matrix.k }}.csv',1000,${{ matrix.k }});"
+          test $(( $(wc -l < /tmp/e6_k_${{ matrix.k }}.csv) - 1 )) -eq 30000
+
+      - name: Upload immutable E6 slice
+        uses: actions/upload-artifact@v4
+        with:
+          name: e6-k-${{ matrix.k }}
+          path: /tmp/e6_k_${{ matrix.k }}.csv
+          retention-days: 90
+
+  e6-combine-evaluate-archive:
+    runs-on: ubuntu-latest
+    needs: e6-slice
+    steps:
+      - name: Check out frozen E6 analysis
+        uses: actions/checkout@v4
+        with:
+          ref: lock/scarce-capacity-transient-shock-preE6
+
+      - name: Download all E6 slices
+        uses: actions/download-artifact@v4
+        with:
+          pattern: e6-k-*
+          path: /tmp/e6_slices
+          merge-multiple: true
+
+      - name: Combine immutable slices
+        run: |
+          python3 - <<'PY'
+          import csv, glob
+          files=sorted(glob.glob('/tmp/e6_slices/e6_k_*.csv'))
+          assert len(files)==4, files
+          out='/tmp/e6_transient_shock_raw.csv'
+          n=0
+          header=None
+          with open(out,'w',newline='') as fo:
+              writer=None
+              for path in files:
+                  with open(path,newline='') as fi:
+                      reader=csv.DictReader(fi)
+                      if header is None:
+                          header=reader.fieldnames
+                          writer=csv.DictWriter(fo,fieldnames=header)
+                          writer.writeheader()
+                      else:
+                          assert reader.fieldnames==header
+                      for row in reader:
+                          writer.writerow(row)
+                          n+=1
+          assert n==120000, n
+          print(f'PASS: combined {n} E6 trajectories')
+          PY
+
+      - name: Summarize E6 production
+        run: |
+          python3 analysis/capacity_v0_10/summarize_e6_transient_shock.py \
+            --input /tmp/e6_transient_shock_raw.csv \
+            --output /tmp/e6_transient_shock_summary.csv
+          test $(( $(wc -l < /tmp/e6_transient_shock_summary.csv) - 1 )) -eq 120
+
+      - name: Evaluate frozen E6 tail tradeoff
+        run: |
+          python3 analysis/capacity_v0_10/evaluate_e6_tail_tradeoff.py \
+            --summary /tmp/e6_transient_shock_summary.csv \
+            --cells-output /tmp/e6_tail_evaluation_cells.csv \
+            --metrics-output /tmp/e6_tail_metrics.csv
+          test $(( $(wc -l < /tmp/e6_tail_evaluation_cells.csv) - 1 )) -eq 120
+          test $(( $(wc -l < /tmp/e6_tail_metrics.csv) - 1 )) -eq 12
+
+      - name: Audit frozen E6 production grid
+        run: |
+          python3 - <<'PY'
+          import csv
+          with open('/tmp/e6_transient_shock_raw.csv',newline='') as f:
+              rows=list(csv.DictReader(f))
+          assert len(rows)==120000
+          assert {int(r['k']) for r in rows}=={4,7,9,15}
+          assert {float(r['ell_s']) for r in rows}=={0.7,0.9,1.0}
+          assert {float(r['gamma']) for r in rows}=={1.0,0.8,0.6,0.5,0.4}
+          assert {r['policy'] for r in rows}=={'matched','uniform'}
+          assert {int(r['replication']) for r in rows}==set(range(1,1001))
+          for r in rows:
+              gamma=float(r['gamma'])
+              assert abs(float(r['gamma_real'])-gamma)<1e-12
+              assert int(float(r['C_shock']))==round(gamma*60)
+              if gamma==1.0:
+                  assert abs(float(r['shock_delay_tilde']))<1e-12
+          print('PASS: E6 production grid, replication count, and shock totals')
+          PY
+
+      - name: Upload combined E6 production artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: e6-transient-shock-production
+          path: |
+            /tmp/e6_transient_shock_raw.csv
+            /tmp/e6_transient_shock_summary.csv
+            /tmp/e6_tail_evaluation_cells.csv
+            /tmp/e6_tail_metrics.csv
+          retention-days: 90
+
+      - name: Prepare permanent Git archive
+        run: |
+          mkdir -p results/raw/e6 results/processed/e6 results/manifests
+          gzip -n -c /tmp/e6_transient_shock_raw.csv > results/raw/e6/e6_transient_shock_raw.csv.gz
+          cp /tmp/e6_transient_shock_summary.csv results/processed/e6/e6_transient_shock_summary.csv
+          cp /tmp/e6_tail_evaluation_cells.csv results/processed/e6/e6_tail_evaluation_cells.csv
+          cp /tmp/e6_tail_metrics.csv results/processed/e6/e6_tail_metrics.csv
+          RAW_SHA=$(sha256sum /tmp/e6_transient_shock_raw.csv | awk '{print $1}')
+          GZ_SHA=$(sha256sum results/raw/e6/e6_transient_shock_raw.csv.gz | awk '{print $1}')
+          SUM_SHA=$(sha256sum results/processed/e6/e6_transient_shock_summary.csv | awk '{print $1}')
+          EVAL_SHA=$(sha256sum results/processed/e6/e6_tail_evaluation_cells.csv | awk '{print $1}')
+          MET_SHA=$(sha256sum results/processed/e6/e6_tail_metrics.csv | awk '{print $1}')
+          cat > results/manifests/e6_production_manifest.txt <<EOF
+          E6 transient-shock production archive
+          source_lock=lock/scarce-capacity-transient-shock-preE6
+          source_commit=107842743af2170e7ed193bfa62cb9d965a1ea0a
+          production_workflow_run_id=${GITHUB_RUN_ID}
+          raw_rows=120000
+          summary_cells=120
+          replications_per_cell=1000
+          raw_csv_sha256=${RAW_SHA}
+          raw_gzip_sha256=${GZ_SHA}
+          summary_csv_sha256=${SUM_SHA}
+          evaluation_cells_csv_sha256=${EVAL_SHA}
+          metrics_csv_sha256=${MET_SHA}
+          EOF
+          sed -i 's/^          //' results/manifests/e6_production_manifest.txt
+
+      - name: Commit immutable E6 production results
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin work/e6-transient-capacity-shock
+          git checkout -B work/e6-transient-capacity-shock origin/work/e6-transient-capacity-shock
+          git add results/raw/e6 results/processed/e6 results/manifests/e6_production_manifest.txt
+          git commit -m 'Archive immutable E6 production results'
+          git push origin work/e6-transient-capacity-shock
