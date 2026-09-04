@@ -1,0 +1,13 @@
+scope,metric,value
+all_shock_cells,n_cells,96
+all_shock_cells,fraction_speed_resilience_tradeoff_q95,0.5
+all_shock_cells,fraction_speed_resilience_tradeoff_ES95,0.5729166666666666
+all_shock_cells,fraction_with_any_negative_delay_probability,0
+all_shock_cells,max_probability_negative_delay,0.0
+uniform_vs_matched,n_paired_cells,48
+uniform_vs_matched,fraction_uniform_q95_delay_greater,0.9375
+uniform_vs_matched,fraction_uniform_ES95_delay_greater,0.9375
+competence_1_vs_0.7,n_paired_cells,32
+competence_1_vs_0.7,fraction_mean_delay_lower_at_ell1,0.21875
+competence_1_vs_0.7,fraction_q95_delay_lower_at_ell1,0.5
+competence_1_vs_0.7,fraction_ES95_delay_lower_at_ell1,0.65625
