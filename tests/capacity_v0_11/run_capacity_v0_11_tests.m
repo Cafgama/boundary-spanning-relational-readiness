@@ -79,14 +79,14 @@ function run_capacity_v0_11_tests()
   end
 
   %% 6. Readiness-threshold exact switch at h=1, C=60, Omega=1.
-  K07 = productive_events_to_threshold(0.4,0.08,0.7).K_integer;
-  K08 = productive_events_to_threshold(0.4,0.08,0.8).K_integer;
-  K09 = productive_events_to_threshold(0.4,0.08,0.9).K_integer;
+  K07 = productive_events_to_threshold(0.4,0.7,0.08).k_required;
+  K08 = productive_events_to_threshold(0.4,0.8,0.08).k_required;
+  K09 = productive_events_to_threshold(0.4,0.9,0.08).k_required;
   assert(K07 == 9 && K08 == 14 && K09 == 22);
   for Theta = [0.7,0.8]
     o = simulate_capacity_learning_readiness_pairing( ...
       p,p,x,x,0.4,0.08,1,1,Theta,60,60,5,73000,83000,'product');
-    K = productive_events_to_threshold(0.4,0.08,Theta).K_integer;
+    K = productive_events_to_threshold(0.4,Theta,0.08).k_required;
     assert(o.T == K);
   end
   o = simulate_capacity_learning_readiness_pairing( ...
@@ -95,7 +95,8 @@ function run_capacity_v0_11_tests()
   assert(o.T - K09 == 45);
 
   %% 7. Assortative fluid benchmark: no-exhaustion endpoint equals no-capacity real crossing.
-  t0 = no_capacity_mean_crossing_real(p,0.4,0.08,1,0.8).T_real;
+  N0 = no_capacity_mean_crossing_real(p,0.4,0.08,1,0.8,1000);
+  t0 = N0.t_cross;
   Fa = fluid_learning_readiness_assortative_symmetric(1,p,ones(1,4)/4,0.4,0.08,1,0.8,60,5);
   assert(abs(Fa.T_real-t0) < 1e-7);
   assert(abs(Fa.first_exhaustion_attempt-15) < tol);
