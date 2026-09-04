@@ -34,13 +34,14 @@ function run_e7_predata_predictions(output_path)
       for h = [0,0.25,0.50,0.75,0.90,1.00]
         p = one_heavy_responsibility(n,h);
         Theta = 0.8;
-        K = productive_events_to_threshold(w0,alpha,Theta).K_integer;
+        K = productive_events_to_threshold(w0,Theta,alpha).k_required;
         for policy = {'matched','uniform'}
           if strcmp(policy{1},'matched'), x = p; else, x = ones(1,n)/n; end
           [~,xr] = allocate_integer_capacity(C,x);
           M = capacity_load_metrics(D,C,p,xr);
           F = fluid_learning_readiness_symmetric(Omega,p,xr,w0,alpha,ell,Theta,C,max_windows);
-          T0 = no_capacity_mean_crossing_real(p,w0,alpha,ell,Theta).T_real;
+          N0 = no_capacity_mean_crossing_real(p,w0,alpha,ell,Theta,D*max_windows);
+          T0 = N0.t_cross;
           [exactT,exactD,note] = exact_identity('A',policy{1},n,C,D,h,Theta,K);
           write_row(fid,header,{'A','product',policy{1},n,C,D,Omega,h,h^2,Theta,K,C/n, ...
             M.Lambda,M.chi,T0,F.T_real,F.T_real-T0,F.first_exhaustion_attempt, ...
@@ -51,7 +52,7 @@ function run_e7_predata_predictions(output_path)
   end
 
   % Panel B: absolute capacity scale.
-  n = 4; Theta = 0.8; K = productive_events_to_threshold(w0,alpha,Theta).K_integer;
+  n = 4; Theta = 0.8; K = productive_events_to_threshold(w0,Theta,alpha).k_required;
   for C = [40,60,120]
     for Omega = [0.6,1.0,1.5]
       D = round(Omega*C);
@@ -62,7 +63,8 @@ function run_e7_predata_predictions(output_path)
           [~,xr] = allocate_integer_capacity(C,x);
           M = capacity_load_metrics(D,C,p,xr);
           F = fluid_learning_readiness_symmetric(Omega,p,xr,w0,alpha,ell,Theta,C,max_windows);
-          T0 = no_capacity_mean_crossing_real(p,w0,alpha,ell,Theta).T_real;
+          N0 = no_capacity_mean_crossing_real(p,w0,alpha,ell,Theta,D*max_windows);
+          T0 = N0.t_cross;
           [exactT,exactD,note] = exact_identity('B',policy{1},n,C,D,h,Theta,K);
           write_row(fid,header,{'B','product',policy{1},n,C,D,Omega,h,h^2,Theta,K,C/n, ...
             M.Lambda,M.chi,T0,F.T_real,F.T_real-T0,F.first_exhaustion_attempt, ...
@@ -75,7 +77,7 @@ function run_e7_predata_predictions(output_path)
   % Panel C: readiness threshold.
   n=4; C=60; Omega=1; D=60;
   for Theta = [0.7,0.8,0.9]
-    K = productive_events_to_threshold(w0,alpha,Theta).K_integer;
+    K = productive_events_to_threshold(w0,Theta,alpha).k_required;
     for h = [0,0.50,0.90,1.00]
       p = one_heavy_responsibility(n,h);
       for policy = {'matched','uniform'}
@@ -83,7 +85,8 @@ function run_e7_predata_predictions(output_path)
         [~,xr] = allocate_integer_capacity(C,x);
         M = capacity_load_metrics(D,C,p,xr);
         F = fluid_learning_readiness_symmetric(Omega,p,xr,w0,alpha,ell,Theta,C,max_windows);
-        T0 = no_capacity_mean_crossing_real(p,w0,alpha,ell,Theta).T_real;
+        N0 = no_capacity_mean_crossing_real(p,w0,alpha,ell,Theta,D*max_windows);
+        T0 = N0.t_cross;
         [exactT,exactD,note] = exact_identity('C',policy{1},n,C,D,h,Theta,K);
         write_row(fid,header,{'C','product',policy{1},n,C,D,Omega,h,h^2,Theta,K,C/n, ...
           M.Lambda,M.chi,T0,F.T_real,F.T_real-T0,F.first_exhaustion_attempt, ...
@@ -93,12 +96,13 @@ function run_e7_predata_predictions(output_path)
   end
 
   % Panel D: pairing robustness.
-  n=4; C=60; Theta=0.8; K=productive_events_to_threshold(w0,alpha,Theta).K_integer;
+  n=4; C=60; Theta=0.8; K=productive_events_to_threshold(w0,Theta,alpha).k_required;
   for Omega = [0.6,1.0,1.5]
     D = round(Omega*C);
     for h = [0,0.50,0.75,0.90,1.00]
       p = one_heavy_responsibility(n,h);
-      T0 = no_capacity_mean_crossing_real(p,w0,alpha,ell,Theta).T_real;
+      N0 = no_capacity_mean_crossing_real(p,w0,alpha,ell,Theta,D*max_windows);
+      T0 = N0.t_cross;
       for pairing = {'product','assortative'}
         for policy = {'matched','uniform'}
           if strcmp(policy{1},'matched'), x=p; else, x=ones(1,n)/n; end
