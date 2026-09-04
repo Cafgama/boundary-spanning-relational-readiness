@@ -1,0 +1,59 @@
+name: Archive frozen E7 pre-data predictions
+
+on:
+  push:
+    branches:
+      - work/e7-robustness-scaling
+    paths:
+      - '.github/workflows/archive-e7-predata-predictions.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  archive-e7-predata:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out E7 branch
+        uses: actions/checkout@v4
+        with:
+          ref: work/e7-robustness-scaling
+
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+
+      - name: Regenerate frozen E7 predictions
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_predata_predictions('/tmp/e7_theory_predictions.csv');"
+          test $(( $(wc -l < /tmp/e7_theory_predictions.csv) - 1 )) -eq 264
+
+      - name: Verify byte identity with validated smoke artifact
+        run: |
+          echo "4967c98ca093745ee36eefde1ad1e683694c43984c48e576d24415d4bd39e97d  /tmp/e7_theory_predictions.csv" | sha256sum -c -
+
+      - name: Prepare permanent pre-data archive
+        run: |
+          mkdir -p results/predata/e7 results/manifests
+          cp /tmp/e7_theory_predictions.csv results/predata/e7/e7_theory_predictions.csv
+          cat > results/manifests/e7_predata_manifest.txt <<'EOF'
+          E7 robustness pre-data prediction archive
+          source_smoke_run_id=33868977530
+          source_smoke_commit=cf87af26c5dcf97acb8afa6ab2e975b4948d4da3
+          source_smoke_artifact_id=9935130258
+          source_smoke_artifact_digest=sha256:42ed9dfa6ac3fa98f5bce94901e7523db282a8cd095e9734a3276cc669d0f3ec
+          prediction_rows=264
+          predictions_sha256=4967c98ca093745ee36eefde1ad1e683694c43984c48e576d24415d4bd39e97d
+          status=PRE_DATA_NO_E7_PRODUCTION_RESULTS_INSPECTED
+          EOF
+
+      - name: Commit immutable E7 pre-data predictions
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results/predata/e7/e7_theory_predictions.csv results/manifests/e7_predata_manifest.txt
+          git diff --cached --quiet && exit 0
+          git commit -m "Archive immutable E7 pre-data theory predictions"
+          git push origin HEAD:work/e7-robustness-scaling
