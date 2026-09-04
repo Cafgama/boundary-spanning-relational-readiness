@@ -1,0 +1,280 @@
+name: E7 robustness and scaling production
+
+on:
+  push:
+    branches:
+      - work/e7-robustness-scaling
+    paths:
+      - '.github/workflows/e7-robustness-production.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  e7-slice:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        slice:
+          - A_n4
+          - A_n8
+          - A_n16
+          - B_C40
+          - B_C60
+          - B_C120
+          - C_T07
+          - C_T08
+          - C_T09
+          - D_product
+          - D_assortative
+    steps:
+      - name: Check out frozen pre-E7 lock
+        uses: actions/checkout@v4
+        with:
+          ref: lock/scarce-capacity-robustness-preE7
+
+      - name: Verify frozen pre-data prediction archive
+        run: |
+          test $(( $(wc -l < results/predata/e7/e7_theory_predictions.csv) - 1 )) -eq 264
+          echo "4967c98ca093745ee36eefde1ad1e683694c43984c48e576d24415d4bd39e97d  results/predata/e7/e7_theory_predictions.csv" | sha256sum -c -
+
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+
+      - name: Run frozen E7 production slice
+        shell: bash
+        run: |
+          ID='${{ matrix.slice }}'
+          OUT="/tmp/e7_${ID}.csv"
+          case "$ID" in
+            A_n4)
+              octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('${OUT}',500,'A',4);"
+              EXPECTED=18000
+              ;;
+            A_n8)
+              octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('${OUT}',500,'A',8);"
+              EXPECTED=18000
+              ;;
+            A_n16)
+              octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('${OUT}',500,'A',16);"
+              EXPECTED=18000
+              ;;
+            B_C40)
+              octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('${OUT}',500,'B',40);"
+              EXPECTED=12000
+              ;;
+            B_C60)
+              octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('${OUT}',500,'B',60);"
+              EXPECTED=12000
+              ;;
+            B_C120)
+              octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('${OUT}',500,'B',120);"
+              EXPECTED=12000
+              ;;
+            C_T07)
+              octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('${OUT}',500,'C',0.7);"
+              EXPECTED=4000
+              ;;
+            C_T08)
+              octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('${OUT}',500,'C',0.8);"
+              EXPECTED=4000
+              ;;
+            C_T09)
+              octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('${OUT}',500,'C',0.9);"
+              EXPECTED=4000
+              ;;
+            D_product)
+              octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('${OUT}',500,'D','product');"
+              EXPECTED=15000
+              ;;
+            D_assortative)
+              octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('${OUT}',500,'D','assortative');"
+              EXPECTED=15000
+              ;;
+            *)
+              echo "Unknown E7 slice: $ID" >&2
+              exit 2
+              ;;
+          esac
+          test $(( $(wc -l < "$OUT") - 1 )) -eq "$EXPECTED"
+
+      - name: Upload immutable E7 slice
+        uses: actions/upload-artifact@v4
+        with:
+          name: e7-slice-${{ matrix.slice }}
+          path: /tmp/e7_${{ matrix.slice }}.csv
+          retention-days: 90
+
+  e7-combine-evaluate-archive:
+    runs-on: ubuntu-latest
+    needs: e7-slice
+    steps:
+      - name: Check out frozen pre-E7 lock
+        uses: actions/checkout@v4
+        with:
+          ref: lock/scarce-capacity-robustness-preE7
+
+      - name: Verify frozen theory before reading production
+        run: |
+          test $(( $(wc -l < results/predata/e7/e7_theory_predictions.csv) - 1 )) -eq 264
+          echo "4967c98ca093745ee36eefde1ad1e683694c43984c48e576d24415d4bd39e97d  results/predata/e7/e7_theory_predictions.csv" | sha256sum -c -
+
+      - name: Install Python analysis dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install numpy pandas
+
+      - name: Download all E7 slices
+        uses: actions/download-artifact@v4
+        with:
+          pattern: e7-slice-*
+          path: /tmp/e7_slices
+          merge-multiple: true
+
+      - name: Combine immutable E7 trajectories
+        run: |
+          python3 - <<'PY'
+          import csv, glob, os
+          files=sorted(glob.glob('/tmp/e7_slices/e7_*.csv'))
+          assert len(files)==11, files
+          out='/tmp/e7_robustness_raw.csv'
+          n=0
+          header=None
+          with open(out,'w',newline='') as fo:
+              writer=None
+              for path in files:
+                  with open(path,newline='') as fi:
+                      reader=csv.DictReader(fi)
+                      if header is None:
+                          header=reader.fieldnames
+                          writer=csv.DictWriter(fo,fieldnames=header)
+                          writer.writeheader()
+                      else:
+                          assert reader.fieldnames==header, path
+                      for row in reader:
+                          writer.writerow(row)
+                          n+=1
+          assert n==132000, n
+          print(f'PASS: combined {n} E7 trajectories from {len(files)} frozen slices')
+          PY
+
+      - name: Audit frozen E7 production grid
+        run: |
+          python3 - <<'PY'
+          import pandas as pd
+          df=pd.read_csv('/tmp/e7_robustness_raw.csv')
+          assert len(df)==132000
+          assert set(df['panel'])=={'A','B','C','D'}
+          assert set(df['policy'])=={'matched','uniform'}
+          assert set(df['replication'])==set(range(1,501))
+          counts=df.groupby(['panel']).size().to_dict()
+          assert counts=={'A':54000,'B':36000,'C':12000,'D':30000}, counts
+          A=df[df.panel=='A']
+          assert set(A.n)=={4,8,16}
+          assert set(A.Theta)=={0.8}
+          assert set(A.pairing)=={'product'}
+          for n,g in A.groupby('n'):
+              assert len(g)==18000
+              assert set(g.C)=={15*n}
+          B=df[df.panel=='B']
+          assert set(B.n)=={4}
+          assert set(B.C)=={40,60,120}
+          for C,g in B.groupby('C'):
+              assert len(g)==12000
+          Cpanel=df[df.panel=='C']
+          assert set(Cpanel.n)=={4}
+          assert set(Cpanel.C)=={60}
+          assert set(Cpanel.Omega)=={1.0}
+          assert set(Cpanel.Theta)=={0.7,0.8,0.9}
+          for theta,g in Cpanel.groupby('Theta'):
+              assert len(g)==4000
+          D=df[df.panel=='D']
+          assert set(D.pairing)=={'product','assortative'}
+          for pairing,g in D.groupby('pairing'):
+              assert len(g)==15000
+          print('PASS: E7 production grid and 500 replications per cell')
+          PY
+
+      - name: Summarize E7 production
+        run: |
+          python3 analysis/capacity_v0_11/summarize_e7_robustness.py \
+            --input /tmp/e7_robustness_raw.csv \
+            --output /tmp/e7_robustness_summary.csv
+          test $(( $(wc -l < /tmp/e7_robustness_summary.csv) - 1 )) -eq 264
+
+      - name: Evaluate against frozen pre-data theory
+        run: |
+          python3 analysis/capacity_v0_11/evaluate_e7_robustness.py \
+            --summary /tmp/e7_robustness_summary.csv \
+            --predictions results/predata/e7/e7_theory_predictions.csv \
+            --cells-output /tmp/e7_evaluated_cells.csv \
+            --metrics-output /tmp/e7_metrics.csv
+          test $(( $(wc -l < /tmp/e7_evaluated_cells.csv) - 1 )) -eq 264
+          test $(( $(wc -l < /tmp/e7_metrics.csv) - 1 )) -eq 30
+
+      - name: Enforce exact pre-registered identities
+        run: |
+          python3 - <<'PY'
+          import pandas as pd
+          m=pd.read_csv('/tmp/e7_metrics.csv')
+          x=m[(m.scope=='exact_identities') & (m.metric=='fraction_exact')]
+          assert len(x)==1
+          assert abs(float(x.iloc[0].value)-1.0)<1e-12, x
+          print('PASS: all exact E7 identities hold in production')
+          PY
+
+      - name: Upload combined E7 production artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: e7-robustness-production
+          path: |
+            /tmp/e7_robustness_raw.csv
+            /tmp/e7_robustness_summary.csv
+            /tmp/e7_evaluated_cells.csv
+            /tmp/e7_metrics.csv
+          retention-days: 90
+
+      - name: Archive immutable E7 production results in Git
+        run: |
+          RAW_SHA=$(sha256sum /tmp/e7_robustness_raw.csv | awk '{print $1}')
+          SUM_SHA=$(sha256sum /tmp/e7_robustness_summary.csv | awk '{print $1}')
+          EVAL_SHA=$(sha256sum /tmp/e7_evaluated_cells.csv | awk '{print $1}')
+          MET_SHA=$(sha256sum /tmp/e7_metrics.csv | awk '{print $1}')
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin work/e7-robustness-scaling
+          git checkout -B work/e7-robustness-scaling origin/work/e7-robustness-scaling
+
+          mkdir -p results/raw/e7 results/processed/e7 results/manifests
+          gzip -n -c /tmp/e7_robustness_raw.csv > results/raw/e7/e7_robustness_raw.csv.gz
+          cp /tmp/e7_robustness_summary.csv results/processed/e7/e7_robustness_summary.csv
+          cp /tmp/e7_evaluated_cells.csv results/processed/e7/e7_evaluated_cells.csv
+          cp /tmp/e7_metrics.csv results/processed/e7/e7_metrics.csv
+          GZ_SHA=$(sha256sum results/raw/e7/e7_robustness_raw.csv.gz | awk '{print $1}')
+
+          cat > results/manifests/e7_production_manifest.txt <<EOF
+          E7 robustness and scaling production archive
+          source_lock=lock/scarce-capacity-robustness-preE7
+          source_commit=2b37f60936c2aa35cdcad15beb553aa72546c35b
+          frozen_predictions_sha256=4967c98ca093745ee36eefde1ad1e683694c43984c48e576d24415d4bd39e97d
+          production_workflow_run_id=${GITHUB_RUN_ID}
+          raw_rows=132000
+          summary_cells=264
+          replications_per_cell=500
+          raw_csv_sha256=${RAW_SHA}
+          raw_gzip_sha256=${GZ_SHA}
+          summary_csv_sha256=${SUM_SHA}
+          evaluated_cells_csv_sha256=${EVAL_SHA}
+          metrics_csv_sha256=${MET_SHA}
+          status=POST_DATA_E7_PRODUCTION_COMPLETE
+          EOF
+          sed -i 's/^          //' results/manifests/e7_production_manifest.txt
+
+          git add results/raw/e7 results/processed/e7 results/manifests/e7_production_manifest.txt
+          git commit -m 'Archive immutable E7 production results'
+          git push origin work/e7-robustness-scaling
