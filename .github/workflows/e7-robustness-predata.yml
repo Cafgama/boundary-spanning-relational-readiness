@@ -1,0 +1,30 @@
+name: E7 robustness pre-data gate
+
+on:
+  push:
+    branches:
+      - work/e7-robustness-scaling
+    paths:
+      - 'src/capacity/generate_pairing_demands.m'
+      - 'src/capacity/simulate_capacity_learning_readiness_pairing.m'
+      - 'src/capacity/fluid_learning_readiness_assortative_symmetric.m'
+      - 'tests/capacity_v0_11/**'
+      - 'docs/capacity_experiment_e7_robustness_design.md'
+      - '.github/workflows/e7-robustness-predata.yml'
+  workflow_dispatch:
+
+jobs:
+  e7-predata:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+
+      - name: Run Model v0.11 robustness tests
+        run: |
+          octave --quiet --eval "cd('tests/capacity_v0_11'); run_capacity_v0_11_tests"
