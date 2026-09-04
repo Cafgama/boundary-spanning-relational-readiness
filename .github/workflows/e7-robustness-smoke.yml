@@ -27,6 +27,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y octave
 
+      - name: Install Python analysis dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install numpy pandas
+
       - name: Run Model v0.11 tests
         run: |
           octave --quiet --eval "cd('tests/capacity_v0_11'); run_capacity_v0_11_tests"
