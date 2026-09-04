@@ -1,6 +1,6 @@
 function run_capacity_v0_10_tests()
 % RUN_CAPACITY_V0_10_TESTS
-% Pre-data E6 tests: integer shock capacity and transient recovery semantics.
+% Pre-data E6 tests: exact total shock severity and transient recovery.
 
   this_dir = fileparts(mfilename('fullpath'));
   repo_root = fileparts(fileparts(this_dir));
@@ -22,18 +22,17 @@ function run_capacity_v0_10_tests()
   assert(isequal(c06,[9,9,9,9]));
   assert(abs(g06-0.6) <= tol);
 
-  %% 2. Floor rounding and nested capacity vectors.
+  %% 2. Largest-remainder shock preserves exact module-level severity.
   c = [39,7,7,7];
   gammas = [1.0,0.8,0.6,0.5,0.4];
-  Cshock = zeros(numel(gammas),numel(c));
   for ig = 1:numel(gammas)
-    [Cshock(ig,:),gr] = transient_shock_capacity(c,gammas(ig));
-    assert(gr <= gammas(ig) + tol);
+    [cs,gr] = transient_shock_capacity(c,gammas(ig));
+    assert(sum(cs) == round(gammas(ig)*sum(c)));
+    assert(abs(gr-gammas(ig)) <= tol);
+    assert(all(cs <= c));
   end
-  for ig = 1:(numel(gammas)-1)
-    assert(all(Cshock(ig+1,:) <= Cshock(ig,:)));
-  end
-  assert(isequal(Cshock(2,:),[31,5,5,5]));
+  [c08,~] = transient_shock_capacity(c,0.8);
+  assert(isequal(c08,[31,6,6,5]));
 
   %% 3. gamma=1 must reproduce Model v0.7 exactly on relevant outputs.
   p = one_heavy_responsibility(4,9/15);
@@ -85,13 +84,14 @@ function run_capacity_v0_10_tests()
   assert(out.n_blocked == 1);
   assert(out.n_windows_started == 2);
 
-  %% 5. Stronger shocks produce componentwise smaller capacity, but no T ordering is asserted.
-  s08 = simulate_transient_capacity_shock_readiness( ...
-    p,p,x,x,0.4,0.08,0.7,0.7,0.8,60,36,10,0.8,22222,33333);
-  s04 = simulate_transient_capacity_shock_readiness( ...
-    p,p,x,x,0.4,0.08,0.7,0.7,0.8,60,36,10,0.4,22222,33333);
-  assert(all(s04.cA_shock <= s08.cA_shock));
-  assert(all(s04.cB_shock <= s08.cB_shock));
+  %% 5. E6 grid shock severities are exact at module level for a matched case.
+  p = one_heavy_responsibility(4,4/15);
+  [cb,~] = allocate_integer_capacity(60,p);
+  for gamma = [1.0,0.8,0.6,0.5,0.4]
+    [cs,gr] = transient_shock_capacity(cb,gamma);
+    assert(sum(cs) == round(gamma*60));
+    assert(abs(gr-gamma) <= tol);
+  end
 
   fprintf('PASS: Model v0.10 transient capacity-shock tests\n');
 end
