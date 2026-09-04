@@ -1,0 +1,108 @@
+name: Archive E5 production results permanently
+
+on:
+  push:
+    branches:
+      - work/e5-competence-switching
+    paths:
+      - '.github/workflows/archive-e5-production-results.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  archive-e5:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_RUN_ID: '33815992624'
+      SOURCE_COMMIT: '744538c48869b24439125d625c8d180a12bf45a0'
+      SOURCE_ARTIFACT: 'e5-competence-switching-screening'
+      SOURCE_ARTIFACT_DIGEST: 'sha256:a9ecb935f3626b2db425854fa68baca3e86f6645929df7396be0b88a097f5f06'
+    steps:
+      - name: Check out E5 branch
+        uses: actions/checkout@v4
+        with:
+          ref: work/e5-competence-switching
+          fetch-depth: 0
+
+      - name: Download frozen E5 production artifact
+        run: |
+          rm -rf /tmp/e5_artifact
+          mkdir -p /tmp/e5_artifact
+          gh run download "$SOURCE_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "$SOURCE_ARTIFACT" \
+            --dir /tmp/e5_artifact
+          test -f /tmp/e5_artifact/e5_competence_switching_raw.csv
+          test -f /tmp/e5_artifact/e5_competence_switching_summary.csv
+          test -f /tmp/e5_artifact/e5_switching_metrics.csv
+          test -f /tmp/e5_artifact/e5_switching_evaluation_cells.csv
+
+      - name: Audit downloaded result dimensions
+        run: |
+          test $(( $(wc -l < /tmp/e5_artifact/e5_competence_switching_raw.csv) - 1 )) -eq 38400
+          test $(( $(wc -l < /tmp/e5_artifact/e5_competence_switching_summary.csv) - 1 )) -eq 192
+          test $(( $(wc -l < /tmp/e5_artifact/e5_switching_evaluation_cells.csv) - 1 )) -eq 192
+          python3 - <<'PY'
+          import csv
+          p='/tmp/e5_artifact/e5_competence_switching_raw.csv'
+          with open(p,newline='') as f:
+              rows=list(csv.DictReader(f))
+          assert len(rows)==38400
+          assert {int(r['k']) for r in rows}=={4,7,8,9,10,11,13,15}
+          assert {float(r['ell_s']) for r in rows}=={0.7,0.8,0.9,1.0}
+          assert {float(r['Omega']) for r in rows}=={0.6,1.0,1.5}
+          assert {r['policy'] for r in rows}=={'matched','uniform'}
+          assert {int(r['replication']) for r in rows}==set(range(1,201))
+          print('PASS: archived E5 grid is complete')
+          PY
+
+      - name: Prepare permanent repository archive
+        run: |
+          mkdir -p results/raw/e5 results/processed/e5 results/manifests
+          gzip -n -9 -c /tmp/e5_artifact/e5_competence_switching_raw.csv \
+            > results/raw/e5/e5_competence_switching_raw.csv.gz
+          cp /tmp/e5_artifact/e5_competence_switching_summary.csv \
+            results/processed/e5/e5_competence_switching_summary.csv
+          cp /tmp/e5_artifact/e5_switching_metrics.csv \
+            results/processed/e5/e5_switching_metrics.csv
+          cp /tmp/e5_artifact/e5_switching_evaluation_cells.csv \
+            results/processed/e5/e5_switching_evaluation_cells.csv
+
+          RAW_SHA=$(sha256sum /tmp/e5_artifact/e5_competence_switching_raw.csv | awk '{print $1}')
+          RAW_GZ_SHA=$(sha256sum results/raw/e5/e5_competence_switching_raw.csv.gz | awk '{print $1}')
+          SUMMARY_SHA=$(sha256sum results/processed/e5/e5_competence_switching_summary.csv | awk '{print $1}')
+          METRICS_SHA=$(sha256sum results/processed/e5/e5_switching_metrics.csv | awk '{print $1}')
+          EVAL_SHA=$(sha256sum results/processed/e5/e5_switching_evaluation_cells.csv | awk '{print $1}')
+
+          cat > results/manifests/e5_production_manifest.txt <<EOF
+          E5 competence-switching production archive
+          source_workflow_run_id=$SOURCE_RUN_ID
+          source_commit=$SOURCE_COMMIT
+          source_artifact=$SOURCE_ARTIFACT
+          source_artifact_digest=$SOURCE_ARTIFACT_DIGEST
+          raw_rows=38400
+          summary_cells=192
+          replications_per_cell=200
+          raw_csv_sha256=$RAW_SHA
+          raw_gzip_sha256=$RAW_GZ_SHA
+          summary_csv_sha256=$SUMMARY_SHA
+          metrics_csv_sha256=$METRICS_SHA
+          evaluation_cells_csv_sha256=$EVAL_SHA
+          EOF
+
+      - name: Commit immutable E5 result archive
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add results/raw/e5 results/processed/e5 results/manifests/e5_production_manifest.txt
+          git diff --cached --stat
+          if git diff --cached --quiet; then
+            echo 'E5 results already archived; nothing to commit.'
+            exit 0
+          fi
+          git commit -m 'Archive immutable E5 production results'
+          git push origin HEAD:work/e5-competence-switching
