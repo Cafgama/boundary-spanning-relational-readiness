@@ -1,0 +1,110 @@
+name: E7 robustness stochastic smoke
+
+on:
+  push:
+    branches:
+      - work/e7-robustness-scaling
+    paths:
+      - 'experiments/capacity_v0_11/run_e7_robustness_panel.m'
+      - 'experiments/capacity_v0_11/run_e7_predata_predictions.m'
+      - 'analysis/capacity_v0_11/**'
+      - 'src/capacity/generate_pairing_demands.m'
+      - 'src/capacity/simulate_capacity_learning_readiness_pairing.m'
+      - 'src/capacity/fluid_learning_readiness_assortative_symmetric.m'
+      - 'tests/capacity_v0_11/**'
+      - '.github/workflows/e7-robustness-smoke.yml'
+  workflow_dispatch:
+
+jobs:
+  e7-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+
+      - name: Run Model v0.11 tests
+        run: |
+          octave --quiet --eval "cd('tests/capacity_v0_11'); run_capacity_v0_11_tests"
+
+      - name: Generate frozen theory predictions
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_predata_predictions('/tmp/e7_predictions.csv');"
+          test $(( $(wc -l < /tmp/e7_predictions.csv) - 1 )) -eq 264
+
+      - name: Generate all four E7 R=1 panels
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('/tmp/e7_A.csv',1,'A');"
+          octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('/tmp/e7_B.csv',1,'B');"
+          octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('/tmp/e7_C.csv',1,'C');"
+          octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('/tmp/e7_D.csv',1,'D');"
+          test $(( $(wc -l < /tmp/e7_A.csv) - 1 )) -eq 108
+          test $(( $(wc -l < /tmp/e7_B.csv) - 1 )) -eq 72
+          test $(( $(wc -l < /tmp/e7_C.csv) - 1 )) -eq 24
+          test $(( $(wc -l < /tmp/e7_D.csv) - 1 )) -eq 60
+          head -1 /tmp/e7_A.csv > /tmp/e7_all.csv
+          for f in /tmp/e7_A.csv /tmp/e7_B.csv /tmp/e7_C.csv /tmp/e7_D.csv; do tail -n +2 "$f" >> /tmp/e7_all.csv; done
+          test $(( $(wc -l < /tmp/e7_all.csv) - 1 )) -eq 264
+
+      - name: Verify execution slice equivalence
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('/tmp/e7_A_n8.csv',1,'A',8);"
+          octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('/tmp/e7_B_C60.csv',1,'B',60);"
+          octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('/tmp/e7_C_T09.csv',1,'C',0.9);"
+          octave --quiet --eval "addpath('experiments/capacity_v0_11'); run_e7_robustness_panel('/tmp/e7_D_assort.csv',1,'D','assortative');"
+          python3 - <<'PY'
+          import csv
+          tests=[
+            ('/tmp/e7_A.csv','/tmp/e7_A_n8.csv',lambda r:int(float(r['n']))==8,36),
+            ('/tmp/e7_B.csv','/tmp/e7_B_C60.csv',lambda r:int(float(r['C']))==60,24),
+            ('/tmp/e7_C.csv','/tmp/e7_C_T09.csv',lambda r:abs(float(r['Theta'])-.9)<1e-12,8),
+            ('/tmp/e7_D.csv','/tmp/e7_D_assort.csv',lambda r:r['pairing']=='assortative',30),
+          ]
+          for full_path,slice_path,pred,n in tests:
+              with open(full_path,newline='') as f: full=[r for r in csv.DictReader(f) if pred(r)]
+              with open(slice_path,newline='') as f: sliced=list(csv.DictReader(f))
+              assert len(full)==len(sliced)==n,(full_path,len(full),len(sliced),n)
+              assert full==sliced,(full_path,slice_path)
+          print('PASS: all E7 execution slices are row-identical to full-run subsets')
+          PY
+
+      - name: Summarize E7 smoke
+        run: |
+          python3 analysis/capacity_v0_11/summarize_e7_robustness.py --input /tmp/e7_all.csv --output /tmp/e7_summary.csv
+          test $(( $(wc -l < /tmp/e7_summary.csv) - 1 )) -eq 264
+
+      - name: Evaluate frozen E7 robustness metrics
+        run: |
+          python3 analysis/capacity_v0_11/evaluate_e7_robustness.py \
+            --summary /tmp/e7_summary.csv \
+            --predictions /tmp/e7_predictions.csv \
+            --cells-output /tmp/e7_evaluated.csv \
+            --metrics-output /tmp/e7_metrics.csv
+          test $(( $(wc -l < /tmp/e7_evaluated.csv) - 1 )) -eq 264
+          test $(( $(wc -l < /tmp/e7_metrics.csv) - 1 )) -eq 30
+
+      - name: Audit only exact identities in smoke
+        run: |
+          python3 - <<'PY'
+          import pandas as pd
+          m=pd.read_csv('/tmp/e7_metrics.csv')
+          x=m[(m.scope=='exact_identities') & (m.metric=='fraction_exact')]
+          assert len(x)==1 and abs(float(x.iloc[0].value)-1)<1e-12
+          print('PASS: all exact E7 identities hold in R=1 smoke')
+          PY
+
+      - name: Upload E7 smoke bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: e7-robustness-smoke
+          path: |
+            /tmp/e7_predictions.csv
+            /tmp/e7_all.csv
+            /tmp/e7_summary.csv
+            /tmp/e7_evaluated.csv
+            /tmp/e7_metrics.csv
+          retention-days: 30
