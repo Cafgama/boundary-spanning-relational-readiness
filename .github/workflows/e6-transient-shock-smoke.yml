@@ -1,0 +1,83 @@
+name: E6 transient shock stochastic smoke
+
+on:
+  push:
+    branches:
+      - work/e6-transient-capacity-shock
+    paths:
+      - 'experiments/capacity_v0_10/**'
+      - 'analysis/capacity_v0_10/**'
+      - '.github/workflows/e6-transient-shock-smoke.yml'
+  workflow_dispatch:
+
+jobs:
+  e6-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install GNU Octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+
+      - name: Run Model v0.10 tests
+        run: |
+          octave --quiet --eval "cd('tests/capacity_v0_10'); run_capacity_v0_10_tests"
+
+      - name: Generate full E6 R=1 smoke
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_10'); run_e6_transient_shock_screening('/tmp/e6_smoke.csv',1);"
+          test $(( $(wc -l < /tmp/e6_smoke.csv) - 1 )) -eq 120
+
+      - name: Verify k=7 slice equivalence
+        run: |
+          octave --quiet --eval "addpath('experiments/capacity_v0_10'); run_e6_transient_shock_screening('/tmp/e6_k7.csv',1,7);"
+          test $(( $(wc -l < /tmp/e6_k7.csv) - 1 )) -eq 30
+          python3 - <<'PY'
+          import csv
+          with open('/tmp/e6_smoke.csv',newline='') as f:
+              full=[r for r in csv.DictReader(f) if int(r['k'])==7]
+          with open('/tmp/e6_k7.csv',newline='') as f:
+              sliced=list(csv.DictReader(f))
+          assert len(full)==len(sliced)==30
+          assert full==sliced
+          print('PASS: E6 k=7 slice is row-identical to full-run subset')
+          PY
+
+      - name: Audit raw E6 grid and exact shock totals
+        run: |
+          python3 - <<'PY'
+          import csv
+          with open('/tmp/e6_smoke.csv',newline='') as f:
+              rows=list(csv.DictReader(f))
+          assert len(rows)==120
+          assert {int(r['k']) for r in rows}=={4,7,9,15}
+          assert {float(r['ell_s']) for r in rows}=={0.7,0.9,1.0}
+          assert {float(r['gamma']) for r in rows}=={1.0,0.8,0.6,0.5,0.4}
+          assert {r['policy'] for r in rows}=={'matched','uniform'}
+          for r in rows:
+              gamma=float(r['gamma'])
+              assert abs(float(r['gamma_real'])-gamma)<1e-12
+              assert int(float(r['C_shock']))==round(gamma*60)
+              if gamma==1.0:
+                  assert abs(float(r['shock_delay_tilde']))<1e-12
+          print('PASS: E6 raw grid and module-level shock severity')
+          PY
+
+      - name: Summarize E6 smoke
+        run: |
+          python3 analysis/capacity_v0_10/summarize_e6_transient_shock.py \
+            --input /tmp/e6_smoke.csv \
+            --output /tmp/e6_summary.csv
+          test $(( $(wc -l < /tmp/e6_summary.csv) - 1 )) -eq 120
+
+      - name: Evaluate frozen E6 tradeoff metrics
+        run: |
+          python3 analysis/capacity_v0_10/evaluate_e6_tail_tradeoff.py \
+            --summary /tmp/e6_summary.csv \
+            --cells-output /tmp/e6_evaluated.csv \
+            --metrics-output /tmp/e6_metrics.csv
+          test $(( $(wc -l < /tmp/e6_evaluated.csv) - 1 )) -eq 120
+          test $(( $(wc -l < /tmp/e6_metrics.csv) - 1 )) -eq 12
