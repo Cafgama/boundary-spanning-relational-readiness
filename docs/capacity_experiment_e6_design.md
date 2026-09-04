@@ -16,7 +16,7 @@ E6 does not refit E5 thresholds and does not change demand generation, learning 
 
 Two modules build cross-boundary coordination readiness through repeated interaction. Actor `i` has a responsibility share `p_i`, baseline integer interaction capacity `c_i`, learning effectiveness `ell_i`, and persistent transferable learning state `w_i`.
 
-Normally each capacity window begins with the baseline capacities. E6 introduces one temporary system-wide disruption: during the **first capacity window only**, every actor retains a fraction `gamma` of baseline interaction capacity. Lost capacity disappears for that window. Demand responsibility, pairing, competence, and learning rules remain unchanged. From the second window onward baseline capacity is fully restored.
+Normally each capacity window begins with the baseline capacities. E6 introduces one temporary system-wide disruption: during the **first capacity window only**, each module retains exactly a fraction `gamma` of its total baseline interaction capacity. That reduced total is redistributed across actors according to the same baseline capacity shares, using the existing deterministic largest-remainder allocation rule. Demand responsibility, pairing, competence, and learning rules remain unchanged. From the second window onward baseline capacity is fully restored.
 
 This is a minimal transient capacity-loss shock. A carrier-specific outage is deliberately postponed because it would immediately add a second mechanism — localization and substitutability of the disruption.
 
@@ -30,36 +30,54 @@ Three alternatives were considered.
 
 **Proportional global capacity loss — selected:** one new mechanism only; architecture and demand shares remain unchanged; the existing local-load theory yields an immediate shock coordinate.
 
-## 3. Shock semantics
+## 3. Integer shock semantics
 
 Let baseline integer capacities satisfy
 
 \[
-c_i\ge0,\qquad \sum_i c_i=C.
+c_i\ge0,\qquad \sum_i c_i=C,
 \]
 
-For retained capacity
+with realized baseline capacity shares
+
+\[
+x_i=c_i/C.
+\]
+
+For retained-capacity fraction
 
 \[
 \gamma\in[0,1],
 \]
 
-the first-window shock capacities are
+E6 uses shock levels for which
 
 \[
-\boxed{c_i^{shock}=\lfloor\gamma c_i\rfloor.}
+\boxed{C^{shock}=\gamma C}
 \]
+
+is an integer. The first-window actor capacities are then
+
+\[
+\boxed{\mathbf c^{shock}=LR(C^{shock},\mathbf x)},
+\]
+
+where `LR` is the same deterministic largest-remainder allocation rule used elsewhere in the model.
+
+Thus
+
+\[
+\boxed{\sum_i c_i^{shock}=\gamma C}
+\]
+
+exactly for every architecture and shock level. This prevents finite integer rounding from making the same nominal `gamma` represent different total shock severity across architectures.
+
+Actor-level shares can differ slightly from baseline `x_i` because the smaller total must be apportioned in integer units. The exact realized shock vector is therefore stored for every trajectory.
 
 For every later window,
 
 \[
-\boxed{c_i^{normal}=c_i.}
-\]
-
-Store the realized module-level retained fraction
-
-\[
-\gamma_{real}=\frac{\sum_i c_i^{shock}}{C}.
+\boxed{c_i^{normal}=c_i}.
 \]
 
 The shock lasts exactly one window of `D` attempted interactions. During that window, demand pairs are generated exactly as in E5; a pair is served iff both endpoints have remaining shock capacity; served interactions consume one unit at both endpoints; blocked attempts consume no capacity and produce no learning; useful learning on a served endpoint occurs independently with probability `ell_i`; and every attempted pair advances the clock. Learning states persist through recovery.
@@ -68,7 +86,7 @@ At the second window boundary, baseline actor capacities are restored.
 
 ## 4. Analytical shock coordinate
 
-Ignoring integer rounding, proportional capacity retention changes local offered load from
+Ignoring finite integer apportionment, proportional capacity retention changes local offered load from
 
 \[
 \omega_i=\Omega\frac{p_i}{x_i}
@@ -92,17 +110,17 @@ For a baseline architecture with `chi<1`, deterministic first exhaustion during 
 \boxed{\gamma_c=\chi}.
 \]
 
-This is a fluid/onset prediction only. The exact finite process remains bilateral and stochastic.
+This is a fluid/onset prediction only. The exact finite process remains bilateral, stochastic, and subject to small actor-level integer-apportionment corrections.
 
 ## 5. Critical bilateral-coupling correction
 
-A tempting claim would be that componentwise smaller shock capacities must produce a pathwise superset of blocking and therefore a later first-passage time. **That claim is false for this bilateral admission process.**
+A tempting claim would be that a stronger capacity shock must produce a pathwise superset of blocking and therefore a later first-passage time. **That claim is false for this bilateral admission process.**
 
-If a stronger shock blocks an early pair because one endpoint is exhausted, the other endpoint does not consume capacity. That preserved capacity can make a later pair feasible in the stronger-shock trajectory even when the weaker-shock trajectory has already spent that endpoint's capacity. Therefore admitted-pair sets need not be nested across `gamma` even though the capacity vectors are nested.
+If one trajectory blocks an early pair because one endpoint is exhausted, the other endpoint does not consume capacity. That preserved capacity can make a later pair feasible even when a less-shocked trajectory has already spent the same endpoint's capacity. Therefore admitted-pair sets need not be nested across `gamma`.
 
 Consequences fixed before data:
 
-1. capacity vectors must be nested as `gamma` falls;
+1. every shock level must preserve the exact module-level retained total `gamma*C`;
 2. `gamma=1` must reproduce the no-shock generic model exactly;
 3. **no pathwise monotonicity of `T` across shock severity is imposed or tested as an invariant**;
 4. paired common random numbers are still used to reduce Monte Carlo noise;
@@ -174,6 +192,12 @@ Use
 \boxed{\gamma\in\{1.0,0.8,0.6,0.5,0.4\}}.
 \]
 
+Since `C=60`, every `gamma*C` is integer:
+
+\[
+60,48,36,30,24.
+\]
+
 `gamma=1` is the no-shock reference; `0.8` lies above the matched/diffuse fluid boundary; `0.6` is the boundary; `0.5` and `0.4` lie below it.
 
 All shock levels for the same architecture and replication use the same complete demand and latent learning streams.
@@ -226,15 +250,15 @@ Diffuse benchmark seeds use `k=0` and `i_ell=0`.
 
 At `gamma=1`, E6 must reproduce the corresponding Model v0.7 finite-capacity trajectory exactly for identical seeds: first passage, event indicator, blocking counts, productive-learning counts, and final readiness.
 
-### 11.2 Nested integer shock capacities
+### 11.2 Exact module-level shock severity
 
-For every actor,
+For every E6 shock level and module,
 
 \[
-\gamma_2<\gamma_1
-\quad\Rightarrow\quad
-\boxed{c_i^{shock}(\gamma_2)\le c_i^{shock}(\gamma_1)}.
+\boxed{\sum_i c_i^{shock}=\gamma C}.
 \]
+
+The same `gamma` therefore means the same total retained interaction capacity across all architectures and policies.
 
 ### 11.3 Recovery identity
 
@@ -287,7 +311,7 @@ Uniform-capacity concentrated architectures will exhibit larger q95 and ES95 sho
 
 ### H6.3 — competence accelerates recovery but does not change stress
 
-Increasing `ell_s` will reduce expected and upper-tail recovery delay while leaving `Lambda`, baseline `chi`, and `chi_shock` unchanged.
+Increasing `ell_s` will reduce expected and upper-tail recovery delay while leaving `Lambda`, baseline `chi`, and the target fluid `chi_shock` unchanged.
 
 ### H6.4 — speed-resilience trade-off
 
@@ -303,8 +327,8 @@ The fraction of realizations with `Delta T < 0`, if nonzero, is reported as a fi
 
 ## 14. Required execution order
 
-1. implement an integer shock-capacity helper;
-2. unit-test capacity nesting and boundary cases;
+1. implement an exact-total integer shock-capacity helper;
+2. unit-test shock severity and boundary cases;
 3. implement a transient-shock simulator without modifying the E5 generic kernel;
 4. prove exact `gamma=1` identity against Model v0.7;
 5. deterministic toy tests for complete first-window capacity loss and second-window recovery;
